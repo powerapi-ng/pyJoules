@@ -18,8 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_sample import EnergySample
-from .energy_trace import EnergyTrace
-from .energy_meter import EnergyMeter
+from .. import EnergyTrace
 
-__version__ = '0.0.1'
+
+class EnergyRecorder:
+    """
+    A statefull object that can format and save the measured value of an energy trace
+    """
+
+    def save_energy(self, trace: EnergyTrace):
+        """
+        Format and save the measured value of an energy trace
+        :param trace: the energy trace to save
+        """
+        raise NotImplementedError()

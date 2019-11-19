@@ -18,8 +18,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_sample import EnergySample
-from .energy_trace import EnergyTrace
-from .energy_meter import EnergyMeter
+from typing import List
 
-__version__ = '0.0.1'
+from .energy_device import EnergyDevice
+from . import EnergyTrace
+
+
+class EnergyMeter:
+    """
+    An aggregation of EnergyDevice used to start Energy trace measure
+    """
+
+    def __init__(self, devices: List[EnergyDevice]):
+        """
+        :param devices: list of EnergyDevice that will be monitored
+        """
+        raise NotImplementedError()
+
+    def start(self, tag: str, domains: List[str]) -> EnergyTrace:
+        """
+        Start to measure energy consumption of an EnergyTrace
+        """
+        raise NotImplementedError()

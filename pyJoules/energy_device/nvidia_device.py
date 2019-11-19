@@ -18,8 +18,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_sample import EnergySample
-from .energy_trace import EnergyTrace
-from .energy_meter import EnergyMeter
+from . import EnergyDevice
+from ..exception import PyJoulesException
 
-__version__ = '0.0.1'
+
+class GPUDoesNotSupportEnergyMonitoringError(PyJoulesException):
+    """
+    Exception raised when a NvidiaDevice is created but the GPU does not support energy monitoring
+    """
+
+
+class NvidiaDevice(EnergyDevice):
+    """
+    Interface to get energy consumption of GPUs
+    """
+
+    _GPU = 'GPU'
+
+    def __init__(self):
+        """
+        :raise NoSuchEnergyDeviceError: if no Nvidia API is available on this machine
+        :raise GPUDoesNotSupportEnergyMonitoringError: if the GPU does not support energy monitoring
+        """
+
+    @staticmethod
+    def gpu(gpu_id: int) -> str:
+        """
+        Get the domain string name for the given GPU
+        :param gpu_id: the GPU id to get the power consumption
+        :return: the domain string name for the given GPU
+        """
+        raise NotImplementedError()

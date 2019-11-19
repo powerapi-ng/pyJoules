@@ -18,8 +18,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_sample import EnergySample
-from .energy_trace import EnergyTrace
-from .energy_meter import EnergyMeter
+from typing import List
 
-__version__ = '0.0.1'
+
+class EnergyDevice:
+    """
+    Interface to get energy consumption information about a specific device
+    """
+
+    def available_domains(self) -> List[str]:
+        """
+        Returns names of the domain that could be monitored on the Device
+        :return: a list of domain names
+        """
+        raise NotImplementedError()
+
+    def get_energy(self, domains: List[str] = []) -> List[float]:
+        """
+        Get the energy consumption of the device since the last device reset
+        :param domains: a list of domains to be monitored, by default (or if you pass an empty list as domains
+                        parameter) all available domains are monitored
+        :return: a list of each domain power consumption. Value order is the same than the domain order passed as
+                 argument. By default this order is the same than the domain list returned by
+                 :py:meth:`pyJoules.energy_device.EnergyDevice.available_domains` method.
+        :raise NoSuchDomainError: if the domain could not be monitored on this machine
+        """
+        raise NotImplementedError()

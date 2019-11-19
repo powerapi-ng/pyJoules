@@ -18,8 +18,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_sample import EnergySample
-from .energy_trace import EnergyTrace
-from .energy_meter import EnergyMeter
 
-__version__ = '0.0.1'
+class PyJoulesException(Exception):
+    """
+    PyJoules exceptions parent class
+    """
+
+
+class NoSuchDomainError(PyJoulesException):
+    """
+    Exception raised when a user ask to monitor a domain that is not available on the given device
+    """
+
+    def __init__(self, domain_name: str):
+        """
+        :param domain_name: the domain name that is not available on this device
+        """
+        PyJoulesException.__init__(self)
+        #: the domain name that is not available on this device
+        self.domain_name = domain_name
+
+
+class NoSuchEnergyDeviceError(PyJoulesException):
+    """
+    Exception raised when a EnergyDevice that does not exist on the current machine is created
+    """
+    
