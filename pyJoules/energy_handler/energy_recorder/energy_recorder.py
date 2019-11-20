@@ -18,23 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Dict
-from dataclasses import dataclass
+from .. import EnergyHandler
 
 
-@dataclass
-class EnergySample:
+class EnergyRecorder(EnergyHandler):
     """
-    :var timestamp: begining timestamp
-    :vartype timestamp: float
-    :var tag: sample tag
-    :vartype tag: str
-    :var duration: duration of the sample
-    :vartype duration: float
-    :var energy: dictionary that contains the energy consumed during this sample
-    :vartype : Dict[str, float]
+    A statefull object that can format and save the measured value of an energy trace
+    The recorder have a buffer that can store the handled EnergyTrace and store every trace in the buffer in one atomic
+    action
     """
-    timestamp: float
-    tag: str
-    duration: float
-    energy: Dict[str, float]
+
+    def __init__(self):
+        EnergyHandler.__init__(self)
+
+        self.trace_buffer = []
+
+    def handle(self, trace):
+        """
+        Add the trace to the buffer
+        """
+
+    def save_data(self):
+        """
+        Save each trace contained in the buffer and empty the buffer
+        """
+        raise NotImplementedError()

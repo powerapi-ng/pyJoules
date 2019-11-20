@@ -18,23 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Dict
-from dataclasses import dataclass
+from .. import EnergyTrace
 
 
-@dataclass
-class EnergySample:
+class EnergyHandler:
     """
-    :var timestamp: begining timestamp
-    :vartype timestamp: float
-    :var tag: sample tag
-    :vartype tag: str
-    :var duration: duration of the sample
-    :vartype duration: float
-    :var energy: dictionary that contains the energy consumed during this sample
-    :vartype : Dict[str, float]
+    An object that can handle the measured value of an energy trace
     """
-    timestamp: float
-    tag: str
-    duration: float
-    energy: Dict[str, float]
+
+    def handle(self, trace: EnergyTrace):
+        """
+        """
+        raise NotImplementedError()

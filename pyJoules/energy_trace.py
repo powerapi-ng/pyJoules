@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import List, Any
+from typing import List, Any, Optional
 from . import EnergySample
 
 
@@ -27,21 +27,29 @@ class EnergyTrace:
     A sequence of energy consumption sample
     """
 
-    def __init__(self, domains: List[str]):
+    def __init__(self, domains: List[str], default_tag: str = ''):
         """
         :param domains: list of the monitored domains
+        :param default_tag: tag given if no tag were given to a measure
         """
         self._domains = domains
         self._end_timestamp = None
-        self._first_sample = None
-        self._last_sample = None
+        self._first_state = None
+        self._last_state = None
 
         # iterator state
         self._current_sample = None
 
-    def record(self, tag: str):
+    def start(self, tag: Optional[str] = None):
         """
-        Add a new sample to the Trace
+        Begin a new energy trace
+        :param tag: sample name
+        """
+        raise NotImplementedError()
+        
+    def record(self, tag: Optional[str] = None):
+        """
+        Add a new state to the Trace
         :param tag: sample name
         """
         raise NotImplementedError()

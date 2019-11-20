@@ -20,6 +20,6 @@
 
 from .energy_sample import EnergySample
 from .energy_trace import EnergyTrace
-from .energy_meter import EnergyMeter
+from .energy_state import EnergyState
 
 __version__ = '0.0.1'

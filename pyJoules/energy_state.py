@@ -18,17 +18,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .. import EnergyTrace
+from typing import List
 
 
-class EnergyRecorder:
+class EnergyState:
     """
-    A statefull object that can format and save the measured value of an energy trace
+    Internal class that record the current energy state of the monitored device
     """
 
-    def save_energy(self, trace: EnergyTrace):
+    def __init__(self, timestamp: float, tag: str, values: List[float]):
         """
-        Format and save the measured value of an energy trace
-        :param trace: the energy trace to save
+        :param timstamp: timestamp of the measure
+        :param tag: tag of the measure
+        :param values: energy consumption measure, this is the list of measured energy consumption values for each
+                       monitored device. This list contains the energy consumption since the last device reset to the
+                       end of this sample
+        """
+        self.timestamp = timestamp
+        self.tag = tag
+        self.values = values
+        self.next_sample = None
+
+    def compute_duration(self) -> float:
+        """
+        :return: compute the time elipsed between the current state and the next state
+        """
+        raise NotImplementedError()
+
+    def compute_energy(self) -> List[float]:
+        """
+        :return: compute the energy consumed between the current state and the next state
+        """
+        raise NotImplementedError()
+
+    def add_next_state(self, sample: EnergyState):
+        """
+        :param previous: next state for the same energy trace
         """
         raise NotImplementedError()
