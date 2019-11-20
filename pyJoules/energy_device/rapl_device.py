@@ -26,10 +26,10 @@ class RaplDevice(EnergyDevice):
     Interface to get energy consumption of CPU domains
     """
 
-    _PACKAGE = 'PKG'
-    _UNCORE = 'UNCORE'
-    _CORE = 'CORE'
-    _DRAM = 'DRAM'
+    PACKAGE_ALL = 'PKG_ALL'
+    UNCORE_ALL = 'UNCORE_ALL'
+    CORE_ALL = 'CORE_ALL'
+    DRAM_ALL = 'DRAM_ALL'
 
     def __init__(self):
         """

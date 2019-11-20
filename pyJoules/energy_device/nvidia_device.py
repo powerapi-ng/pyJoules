@@ -33,7 +33,7 @@ class NvidiaDevice(EnergyDevice):
     Interface to get energy consumption of GPUs
     """
 
-    _GPU = 'GPU'
+    GPU_ALL = 'GPU_ALL'
 
     def __init__(self):
         """
