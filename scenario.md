@@ -76,7 +76,7 @@ foo()
 meter.record(tag="foo")
 bar()
 meter.stop(tag="bar")
-samples - meter.compute()
+samples = meter.compute()
 ConsolePrinter.process(samples)
 
 sample = samples.get_sample("bar)
