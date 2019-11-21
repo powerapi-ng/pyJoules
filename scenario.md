@@ -48,17 +48,37 @@ with EnergyTrace(devices, default_tag='tag') as trace:
 ```python
 from pyJoules import *
 
-meter = EnergyMeter.build(RaplDevice, NvidiaDevice)
+# Usage 1 (basic)
+with EnergyContext:
+	foo()
+	bar()
 
-trace = meter.start(NvidiaDevice.GPU, RaplDevice.ALL)
-foo()
-trace.record(tag="foo")
-bar()
-trace.stop(tag="bar")
-ConsoleRecorder.save(trace)
+# Usage 2 (basic)
+@measureit
+def foo():
+	pass
 
-with trace(ConsoleRecorder(), tag="bar", NvidiaDevice.GPU, RaplDevice.ALL) as trace:
+# Usage 3 (configurable)
+with EnergyContext(ConsolePrinter(), tag="bar", NvidiaDevice.GPU(1), RaplDevice.ALL()) as trace:
 	foo()
 	trace.record(tag="foo")
-	bar()	
+	bar()
+
+# Usage 4 (configurable)
+@measureit(ConsolePrinter(), NvidiaDevice.GPU(1), RaplDevice.ALL())
+def foo():
+	pass
+
+# Usage 4 (advanced)
+meter = EnergyMeter(NvidiaDevice.GPU(1), RaplDevice.ALL())
+
+meter.start()
+foo()
+meter.record(tag="foo")
+bar()
+meter.stop(tag="bar")
+ConsolePrinter.process(trace)
+
+sample = meter.get_sample("bar)
+print sample.energy(NvidiaDevice.GPU)
 ```
