@@ -13,18 +13,18 @@ def foo():
 	pass
 
 # Usage 3 (configurable)
-with EnergyContext(ConsolePrinter(), tag="bar", NvidiaDevice.GPU(1), RaplDevice.ALL()) as meter:
+with EnergyContext(ConsolePrinter, tag="bar", NvidiaDevice.GPU(1), RaplDevice.ALL) as ctx:
 	foo()
-	meter.record(tag="foo")
+	ctx.record(tag="foo")
 	bar()
 
 # Usage 4 (configurable)
-@measureit(ConsolePrinter(), NvidiaDevice.GPU(1), RaplDevice.ALL())
+@measureit(ConsolePrinter, NvidiaDevice.GPU(1), RaplDevice.ALL)
 def foo():
 	pass
 
 # Usage 5 (advanced)
-meter = EnergyMeter(CudaDevice.GPU, RaplDevice.CORE())
+meter = EnergyMeter(CudaDevice.GPU, RaplDevice.CORE)
 meter.start()
 foo()
 meter.record(tag="foo")
@@ -33,6 +33,6 @@ meter.stop(tag="bar")
 samples = meter.compute()
 ConsolePrinter.process(samples)
 
-sample = samples.get_sample("bar)
+sample = samples.get_sample("bar")
 print sample.energy(CudaDevice.GPU)
 ```
