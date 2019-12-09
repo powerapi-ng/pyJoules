@@ -17,22 +17,34 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from dataclasses import dataclass
-from typing import Dict
 
-@dataclass
-class EnergySample:
+import pytest
+
+from pyJoules.energy_device.rapl_device import RaplCoreDomain, RaplDramDomain, RaplPackageDomain, RaplUncoreDomain
+
+
+@pytest.fixture(params=[-1, 0, 1])
+def integer_value(request):
+    """parametrize a test function with negative, null and positive integers
     """
-    :var timestamp: begining timestamp
-    :vartype timestamp: float
-    :var tag: sample tag
-    :vartype tag: str
-    :var duration: duration of the sample
-    :vartype duration: float
-    :var energy: dictionary that contains the energy consumed during this sample
-    :vartype : Dict[str, float]
-    """
-    timestamp: float
-    tag: str
-    duration: float
-    energy: Dict[str, float]
+    return request.param
+
+
+def test_uncore_repr_return_uncore_underscore_socket_id(integer_value):
+    domain = RaplUncoreDomain(integer_value)
+    assert str(domain) == 'uncore_' + str(integer_value)
+
+
+def test_core_repr_return_core_underscore_socket_id(integer_value):
+    domain = RaplCoreDomain(integer_value)
+    assert str(domain) == 'core_' + str(integer_value)
+
+
+def test_package_repr_return_package_underscore_socket_id(integer_value):
+    domain = RaplPackageDomain(integer_value)
+    assert str(domain) == 'package_' + str(integer_value)
+
+
+def test_dram_repr_return_dram_underscore_socket_id(integer_value):
+    domain = RaplDramDomain(integer_value)
+    assert str(domain) == 'dram_' + str(integer_value)

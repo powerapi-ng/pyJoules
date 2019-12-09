@@ -18,8 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from . import EnergyDevice
+from . import EnergyDevice, EnergyDomain
 from ..exception import PyJoulesException
+
+
+class NvidiaGPUDomain(EnergyDomain):
+
+    def __init__(self, device_id):
+        EnergyDomain.__init__(self)
+        self.device_id = device_id
+
+    def __repr__(self):
+        raise NotImplementedError()
 
 
 class GPUDoesNotSupportEnergyMonitoringError(PyJoulesException):
@@ -32,8 +42,6 @@ class NvidiaDevice(EnergyDevice):
     """
     Interface to get energy consumption of GPUs
     """
-
-    GPU_ALL = 'GPU_ALL'
 
     def __init__(self):
         """

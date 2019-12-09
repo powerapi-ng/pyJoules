@@ -18,7 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import List
+from typing import List, Optional
+
+from . import EnergyDomain
 
 
 class EnergyDevice:
@@ -26,21 +28,40 @@ class EnergyDevice:
     Interface to get energy consumption information about a specific device
     """
 
-    def available_domains(self) -> List[str]:
+    @staticmethod
+    def available_domains() -> List[str]:
         """
         Returns names of the domain that could be monitored on the Device
         :return: a list of domain names
+        :raise NoSuchEnergyDeviceError: if the device is not available on this machine
         """
         raise NotImplementedError()
 
-    def get_energy(self, domains: List[str] = []) -> List[float]:
+    def configure(self, domains: List[EnergyDomain]):
+        """
+        configure the device to return only the energy consumption of the given energy domain when calling the
+        :py:meth:`pyJoules.energy_device.EnergyDevice.get_energy` method
+        :param domains: domains to be monitored by the device
+        :raise NoSuchDomainError: if one given domain could not be monitored on this machine
+        """
+        raise NotImplementedError()
+
+    def get_energy(self) -> List[float]:
         """
         Get the energy consumption of the device since the last device reset
-        :param domains: a list of domains to be monitored, by default (or if you pass an empty list as domains
-                        parameter) all available domains are monitored
         :return: a list of each domain power consumption. Value order is the same than the domain order passed as
-                 argument. By default this order is the same than the domain list returned by
-                 :py:meth:`pyJoules.energy_device.EnergyDevice.available_domains` method.
-        :raise NoSuchDomainError: if the domain could not be monitored on this machine
+                 argument to the :py:meth:`pyJoules.energy_device.EnergyDevice.configure` method.
+        """
+        raise NotImplementedError()
+
+
+class EnergyDeviceFactory:
+
+    @staticmethod
+    def create(domains: List[EnergyDomain]) -> List[EnergyDevice]:
+        """
+        return a list of devices that configured to monitor the given energy domains
+        :param domains: list of energy domains to monitor
+        :return: a list of energy devices configured to monitor the given energy domains
         """
         raise NotImplementedError()

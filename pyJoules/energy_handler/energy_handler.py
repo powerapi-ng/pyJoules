@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .. import EnergyTrace
+from .. import EnergySample
 
 
 class EnergyHandler:
@@ -26,7 +26,7 @@ class EnergyHandler:
     An object that can handle the measured value of an energy trace
     """
 
-    def handle(self, trace: EnergyTrace):
+    def handle(self, trace: EnergySample):
         """
         """
         raise NotImplementedError()

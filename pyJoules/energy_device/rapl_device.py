@@ -18,7 +18,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from . import EnergyDevice
+from typing import List
+
+from . import EnergyDevice, EnergyDomain
+
+
+class RaplDomain(EnergyDomain):
+
+    def __init__(self, socket : int):
+        EnergyDomain.__init__(self)
+        self.socket = socket
+
+
+class RaplCoreDomain(RaplDomain):
+
+    def __repr__(self) -> str:
+        raise NotImplementedError()
+
+
+class RaplUncoreDomain(RaplDomain):
+
+    def __repr__(self) -> str:
+        raise NotImplementedError()
+
+
+class RaplDramDomain(RaplDomain):
+
+    def __repr__(self) -> str:
+        raise NotImplementedError()
+
+
+class RaplPackageDomain(RaplDomain):
+
+    def __repr__(self) -> str:
+        raise NotImplementedError()
 
 
 class RaplDevice(EnergyDevice):
@@ -26,48 +59,36 @@ class RaplDevice(EnergyDevice):
     Interface to get energy consumption of CPU domains
     """
 
-    PACKAGE_ALL = 'PKG_ALL'
-    UNCORE_ALL = 'UNCORE_ALL'
-    CORE_ALL = 'CORE_ALL'
-    DRAM_ALL = 'DRAM_ALL'
-
     def __init__(self):
         """
         :raise NoSuchEnergyDeviceError: if no RAPL API is available on this machine
         """
+        raise NotImplementedError()
 
     @staticmethod
-    def package(socket_id: int) -> str:
+    def available_package_domains() -> List[RaplPackageDomain]:
         """
-        Get the domain string name to get package power consumption for the given CPU socket
-        :param socket_id: the CPU socket to get the power consumption
-        :return: the package domain name for the given CPU socket
+        return a the list of the available energy Package domains
         """
         raise NotImplementedError()
 
     @staticmethod
-    def uncore(socket_id: int) -> str:
+    def available_dram_domains() -> List[RaplDramDomain]:
         """
-        Get the domain string name to get uncore power consumption for the given CPU socket
-        :param socket_id: the CPU socket to get the power consumption
-        :return: the uncore domain name for the given CPU socket
+        return a the list of the available energy Dram domains
         """
         raise NotImplementedError()
 
     @staticmethod
-    def core(socket_id: int) -> str:
+    def available_core_domains() -> List[RaplCoreDomain]:
         """
-        Get the domain string name to get core power consumption for the given CPU socket
-        :param socket_id: the CPU socket to get the power consumption
-        :return: the core domain name for the given CPU socket
+        return a the list of the available energy Core domains
         """
         raise NotImplementedError()
 
     @staticmethod
-    def dram(socket_id: int) -> str:
+    def available_uncore_domains() -> List[RaplUncoreDomain]:
         """
-        Get the domain string name to get dram power consumption for the given CPU socket
-        :param socket_id: the CPU socket to get the power consumption
-        :return: the dram domain name for the given CPU socket
+        return a the list of the available energy Uncore domains
         """
         raise NotImplementedError()

@@ -18,6 +18,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_device import EnergyDevice
-from .rapl_device import RaplDevice
-from .nvidia_device import NvidiaDevice
+from .energy_domain import EnergyDomain
+from .energy_device import EnergyDevice, EnergyDeviceFactory

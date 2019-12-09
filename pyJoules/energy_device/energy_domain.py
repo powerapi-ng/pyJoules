@@ -17,22 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from dataclasses import dataclass
-from typing import Dict
 
-@dataclass
-class EnergySample:
+
+class EnergyDomain:
     """
-    :var timestamp: begining timestamp
-    :vartype timestamp: float
-    :var tag: sample tag
-    :vartype tag: str
-    :var duration: duration of the sample
-    :vartype duration: float
-    :var energy: dictionary that contains the energy consumed during this sample
-    :vartype : Dict[str, float]
+    Identify a domain, a monitorable sub-part of a device
     """
-    timestamp: float
-    tag: str
-    duration: float
-    energy: Dict[str, float]
+
+    def __repr__(self) -> str:
+        raise NotImplementedError()
