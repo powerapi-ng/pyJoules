@@ -28,13 +28,17 @@ from pyJoules.energy_device import EnergyDevice, EnergyDomain
 
 DEVICE1_ENERGY_TRACE = [[1.0, 1.1],
                         [2.0, 2.2],
-                        [3.0, 3.4]]
+                        [3.0, 3.4],
+                        [4.0, 4.6],
+                        [5.0, 5.8]]
 
 DEVICE2_ENERGY_TRACE = [[4.0],
                         [6.2],
-                        [8.0]]
+                        [8.0],
+                        [10.3],
+                        [11.123]]
 
-TIMESTAMP_TRACE = [1.1, 2.2, 3.3]
+TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
 
 
 class EnergyDomainDevice1Domain1(EnergyDomain):
@@ -155,9 +159,9 @@ def sample1():
     ts = TIMESTAMP_TRACE[0]
     tag = ''
     duration = TIMESTAMP_TRACE[1] - TIMESTAMP_TRACE[0]
-    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[0][0],
-              str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[0][1],
-              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[0][0]}
+    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[1][0] - DEVICE1_ENERGY_TRACE[0][0],
+              str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[1][1] - DEVICE1_ENERGY_TRACE[0][1],
+              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[1][0] - DEVICE2_ENERGY_TRACE[0][0]}
     return EnergySample(ts, tag, duration, energy)
 
 
@@ -165,9 +169,18 @@ def sample2():
     ts = TIMESTAMP_TRACE[1]
     tag = ''
     duration = TIMESTAMP_TRACE[2] - TIMESTAMP_TRACE[1]
-    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[1][0],
-              str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[1][1],
-              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[1][0]}
+    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[2][0] - DEVICE1_ENERGY_TRACE[1][0],
+              str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[2][1] - DEVICE1_ENERGY_TRACE[1][1],
+              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[2][0] - DEVICE2_ENERGY_TRACE[1][0]}
+    return EnergySample(ts, tag, duration, energy)
+
+def sample3():
+    ts = TIMESTAMP_TRACE[3]
+    tag = ''
+    duration = TIMESTAMP_TRACE[4] - TIMESTAMP_TRACE[3]
+    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[4][0] - DEVICE1_ENERGY_TRACE[3][0],
+              str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[4][1] - DEVICE1_ENERGY_TRACE[3][1],
+              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[4][0] - DEVICE2_ENERGY_TRACE[3][0]}
     return EnergySample(ts, tag, duration, energy)
 
 
@@ -234,6 +247,21 @@ def test_get_sample_that_does_not_exist_raise_SampleNotFoundError(energy_meter):
 
     with pytest.raises(SampleNotFoundError):
         energy_meter.get_sample('sample1')
+
+
+def test_second_start_on_an_energy_meter_should_restart_the_trace(energy_meter, sample3):
+    energy_meter.start()
+    energy_meter.record()
+    energy_meter.stop()
+    energy_meter.start()
+    energy_meter.stop()
+
+    samples = []
+    for sample in energy_meter:
+        samples.append(sample)
+
+    assert len(samples) == 1
+    assert_sample_are_equals(samples[0], sample3)
 
 
 ############
