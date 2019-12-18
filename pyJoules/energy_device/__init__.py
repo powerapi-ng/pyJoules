@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 from .energy_domain import EnergyDomain
-from .energy_device import EnergyDevice, EnergyDeviceFactory
+from .energy_device import EnergyDevice, EnergyDeviceFactory, NotConfiguredDeviceException

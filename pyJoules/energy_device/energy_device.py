@@ -21,6 +21,12 @@
 from typing import List, Optional
 
 from . import EnergyDomain
+from ..exception import PyJoulesException
+
+class NotConfiguredDeviceException(PyJoulesException):
+    """
+    Exception raised when a user call the get_energy method if a device that was not configured before
+    """
 
 
 class EnergyDevice:
@@ -37,11 +43,11 @@ class EnergyDevice:
         """
         raise NotImplementedError()
 
-    def configure(self, domains: List[EnergyDomain]):
+    def configure(self, domains: List[EnergyDomain] = None):
         """
         configure the device to return only the energy consumption of the given energy domain when calling the
         :py:meth:`pyJoules.energy_device.EnergyDevice.get_energy` method
-        :param domains: domains to be monitored by the device
+        :param domains: domains to be monitored by the device, if None, all the available domain will be monitored
         :raise NoSuchDomainError: if one given domain could not be monitored on this machine
         """
         raise NotImplementedError()

@@ -22,7 +22,9 @@ import pytest
 
 from ... utils.rapl_fs import *
 
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
+from pyJoules.energy_device import NotConfiguredDeviceException
+from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain, RaplCoreDomain
+from pyJoules.energy_device.rapl_device import RaplUncoreDomain
 from pyJoules.exception import NoSuchEnergyDeviceError, NoSuchDomainError
 
 ##############
@@ -32,7 +34,7 @@ def test_create_RaplDevice_with_no_rapl_api_raise_NoSuchEnergyDeviceError(empty_
     with pytest.raises(NoSuchEnergyDeviceError):
         RaplDevice()
 
-def test_create_RaplDevice(empty_fs):
+def test_create_RaplDevice(fs_pkg_one_socket):
     device = RaplDevice()
     assert device is not None
     assert isinstance(device, RaplDevice)
@@ -47,26 +49,44 @@ def test_available_domains_with_no_rapl_api_raise_NoSuchEnergyDeviceError(empty_
 
 
 def test_available_domains_with_pkg_rapl_api_return_correct_values(fs_pkg_one_socket):
-    assert RaplDevice.available_domains() == [RaplPackageDomain(0)]
+    returned_values = RaplDevice.available_domains()
+    correct_values = [RaplPackageDomain(0)]
+    assert sorted(correct_values) == sorted(returned_values)
 
 
 def test_available_domains_with_pkg_and_dram_rapl_api_return_correct_values(fs_pkg_dram_one_socket):
-    assert RaplDevice.available_domains() == [RaplPackageDomain(0), RaplDramDomain(0)]
+    returned_values = RaplDevice.available_domains()
+    correct_values = [RaplPackageDomain(0), RaplDramDomain(0)]
+    assert sorted(correct_values) == sorted(returned_values)
+
+def test_available_domains_with_pkg_core_and_dram_rapl_api_return_correct_values(fs_pkg_dram_core_one_socket):
+    returned_values = RaplDevice.available_domains()
+    correct_values = [RaplPackageDomain(0), RaplDramDomain(0), RaplCoreDomain(0)]
+    assert sorted(correct_values) == sorted(returned_values)
+
+
+def test_available_domains_with_pkg_uncore_and_dram_rapl_api_return_correct_values(fs_pkg_dram_uncore_one_socket):
+    returned_values = RaplDevice.available_domains()
+    correct_values = [RaplPackageDomain(0), RaplDramDomain(0), RaplUncoreDomain(0)]
+    assert sorted(correct_values) == sorted(returned_values)
 
 
 def test_available_domains_with_pkg_psys_rapl_api_return_correct_values(fs_pkg_psys_one_socket):
-    assert RaplDevice.available_domains() == [RaplPackageDomain(0)]
+    returned_values = RaplDevice.available_domains()
+    correct_values = [RaplPackageDomain(0)]
+    assert sorted(correct_values) == sorted(returned_values)
 
 
-def test_available_domains_with_pkg_dram__rapl_api_two_cpu_return_correct_values(fs_pkg_psys_one_socket):
+def test_available_domains_with_pkg_dram_rapl_api_two_cpu_return_correct_values(fs_pkg_dram_two_socket):
+    returned_values = RaplDevice.available_domains()
     correct_values = [RaplPackageDomain(0), RaplDramDomain(0), RaplPackageDomain(1), RaplDramDomain(1)]
-    assert RaplDevice.available_domains() == correct_values
+    assert sorted(correct_values) == sorted(returned_values)
 
 
 ###################
 # CONFIGURE TESTS #
 ###################
-def test_configure_device_to_get_dram_energy_with_no_rapl_dram_api_raise_NoSuchDomainError(fs_pkg_dram_one_socket):
+def test_configure_device_to_get_dram_energy_with_no_rapl_dram_api_raise_NoSuchDomainError(fs_pkg_one_socket):
     device = RaplDevice()
 
     with pytest.raises(NoSuchDomainError):
@@ -84,17 +104,20 @@ def test_configure_device_to_get_pkg_energy_on_cpu1_with_no_cpu1_raise_NoSuchDom
 ########################################
 def test_get_default_energy_values_with_pkg_rapl_api(fs_pkg_one_socket):
     device = RaplDevice()
+    device.configure()
     assert device.get_energy() == [PKG_0_VALUE]
 
 
 def test_get_default_energy_values_with_pkg_dram_rapl_api(fs_pkg_dram_one_socket):
     device = RaplDevice()
+    device.configure()
     assert device.get_energy() == [PKG_0_VALUE, DRAM_0_VALUE]
 
 
 def test_get_default_energy_values_with_pkg_dram_rapl_api_two_sockets(fs_pkg_dram_two_socket):
     device = RaplDevice()
-    assert device.get_energy() == [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE]
+    device.configure()
+    assert device.get_energy() == [PKG_0_VALUE, PKG_1_VALUE, DRAM_0_VALUE, DRAM_1_VALUE]
 
 
 ##################################
@@ -110,7 +133,7 @@ def test_get_package_energy_with_only_pkg_rapl_api_return_correct_value(fs_pkg_o
     """
     device = RaplDevice()
     device.configure([RaplPackageDomain(0)])
-    assert device.get_energy == [PKG_0_VALUE]
+    assert device.get_energy() == [PKG_0_VALUE]
 
 
 def test_get_dram_energy_with_pkg_dram_rapl_api_return_correct_value(fs_pkg_dram_one_socket):
@@ -123,7 +146,7 @@ def test_get_dram_energy_with_pkg_dram_rapl_api_return_correct_value(fs_pkg_dram
     """
     device = RaplDevice()
     device.configure([RaplDramDomain(0)])
-    assert device.get_energy == [DRAM_0_VALUE]
+    assert device.get_energy() == [DRAM_0_VALUE]
 
 
 def test_get_package_dram_energy_with_pkg_dram_rapl_api_return_correct_value(fs_pkg_dram_one_socket):
@@ -136,10 +159,10 @@ def test_get_package_dram_energy_with_pkg_dram_rapl_api_return_correct_value(fs_
     """
     device = RaplDevice()
     device.configure([RaplPackageDomain(0), RaplDramDomain(0)])
-    assert device.get_energy == [PKG_0_VALUE, DRAM_0_VALUE]
+    assert device.get_energy() == [PKG_0_VALUE, DRAM_0_VALUE]
 
 
-def test_get_dram_pacakge_energy_with_pkg_dram_rapl_api_return_correct_values_in_correct_order(fs_pkg_dram_one_socket):
+def test_get_dram_package_energy_with_pkg_dram_rapl_api_return_correct_values_in_correct_order(fs_pkg_dram_one_socket):
     """
     Create a RaplDevice instance on a machine with package and dram rapl api with on one socket
     configure it to monitor dram and package domains
@@ -148,8 +171,8 @@ def test_get_dram_pacakge_energy_with_pkg_dram_rapl_api_return_correct_values_in
     - these elements are the power consumption of the dram and package on socket 0
     """
     device = RaplDevice()
-    device.configure([RaplPackageDomain(0), RaplDramDomain(0)])
-    assert device.get_energy == [DRAM_0_VALUE, PKG_0_VALUE]
+    device.configure([RaplDramDomain(0), RaplPackageDomain(0)])
+    assert device.get_energy() == [DRAM_0_VALUE, PKG_0_VALUE]
 
 
 def test_get_package_dram_energy_with_pkg_dram_rapl_api_two_sockets_return_correct_value(fs_pkg_dram_two_socket):
@@ -162,7 +185,7 @@ def test_get_package_dram_energy_with_pkg_dram_rapl_api_two_sockets_return_corre
     """
     device = RaplDevice()
     device.configure([RaplPackageDomain(0), RaplDramDomain(0), RaplPackageDomain(1), RaplDramDomain(1)])
-    assert device.get_energy == [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE]
+    assert device.get_energy() == [PKG_0_VALUE, DRAM_0_VALUE, PKG_1_VALUE, DRAM_1_VALUE]
 
 
 def test_get_package0_and_all_dram_energy_with_pkg_dram_rapl_api_two_sockets_return_correct_value(fs_pkg_dram_two_socket):
@@ -174,5 +197,5 @@ def test_get_package0_and_all_dram_energy_with_pkg_dram_rapl_api_two_sockets_ret
     - these elements are the power consumption of the package on socket 0 and dram on socket 0 and socket 1
     """
     device = RaplDevice()
-    device.configure([RaplPackageDomain(0), RaplDramDomain(0), RaplPackageDomain(1), RaplDramDomain(1)])
-    assert device.get_energy == [PKG_0_VALUE, DRAM_0_VALUE, DRAM_1_VALUE]
+    device.configure([RaplPackageDomain(0), RaplDramDomain(0), RaplDramDomain(1)])
+    assert device.get_energy() == [PKG_0_VALUE, DRAM_0_VALUE, DRAM_1_VALUE]
