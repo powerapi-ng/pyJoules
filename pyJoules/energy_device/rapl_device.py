@@ -28,30 +28,33 @@ class RaplDomain(EnergyDomain):
     def __init__(self, socket : int):
         EnergyDomain.__init__(self)
         self.socket = socket
+        self._repr = self._get_domain_name() + '_' + str(socket)
+
+    def _get_domain_name(self):
+        raise NotImplementedError()
+
+    def __repr__(self) -> str:
+        return self._repr
 
 
 class RaplCoreDomain(RaplDomain):
-
-    def __repr__(self) -> str:
-        raise NotImplementedError()
+    def _get_domain_name(self):
+        return "core"
 
 
 class RaplUncoreDomain(RaplDomain):
-
-    def __repr__(self) -> str:
-        raise NotImplementedError()
+    def _get_domain_name(self):
+        return "uncore"
 
 
 class RaplDramDomain(RaplDomain):
-
-    def __repr__(self) -> str:
-        raise NotImplementedError()
+    def _get_domain_name(self):
+        return "dram"
 
 
 class RaplPackageDomain(RaplDomain):
-
-    def __repr__(self) -> str:
-        raise NotImplementedError()
+    def _get_domain_name(self):
+        return "package"
 
 
 class RaplDevice(EnergyDevice):
