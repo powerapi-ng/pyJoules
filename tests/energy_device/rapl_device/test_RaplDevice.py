@@ -98,6 +98,33 @@ def test_configure_device_to_get_pkg_energy_on_cpu1_with_no_cpu1_raise_NoSuchDom
     with pytest.raises(NoSuchDomainError):
         device.configure([RaplPackageDomain(1)])
 
+def test_get_configured_domains_on_non_configured_device_raise_NotConfiguredDeviceException():
+    device = RaplDevice()
+
+    with pytest.raises(NotConfiguredDeviceException):
+        device.get_configured_domains()
+
+
+def test_get_configured_domains_with_default_values_on_pkg_rapl_api_return_correct_values(fs_pkg_one_socket):
+    configured_domains = [RaplPackageDomain(0)]
+    device = RaplDevice()
+    device.configure()
+    assert configured_domains == device.get_configured_domains()
+
+
+def test_get_configured_domains_with_default_values_on_pkg_dram_rapl_api_return_correct_values(fs_pkg_dram_one_socket):
+    configured_domains = [RaplPackageDomain(0), RaplDramDomain(0)]
+    device = RaplDevice()
+    device.configure()
+    assert configured_domains == device.get_configured_domains()
+
+
+def test_get_configured_domains_with_pkg_values_on_pkg_dram_rapl_api_return_correct_values(fs_pkg_dram_one_socket):
+    configured_domains = [RaplPackageDomain(0)]
+    device = RaplDevice()
+    device.configure(configured_domains)
+    assert configured_domains == device.get_configured_domains()
+
 
 ########################################
 # GET ENERGY WITH DEFAULT VALUES TESTS #

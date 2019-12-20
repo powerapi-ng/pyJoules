@@ -89,8 +89,8 @@ class RaplDevice(EnergyDevice):
         """
         :raise NoSuchEnergyDeviceError: if no RAPL API is available on this machine
         """
+        EnergyDevice.__init__(self)
         self._available_domains = self.available_domains()
-        self._configured_domains = None
         self._api_files = None
 
     @staticmethod

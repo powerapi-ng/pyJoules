@@ -25,7 +25,7 @@ from ..exception import PyJoulesException
 
 class NotConfiguredDeviceException(PyJoulesException):
     """
-    Exception raised when a user call the get_energy method if a device that was not configured before
+    Exception raised when a user call a device method that need the device to be configured on a non configured device
     """
 
 
@@ -34,6 +34,9 @@ class EnergyDevice:
     Interface to get energy consumption information about a specific device
     """
 
+    def __init__(self):
+        self._configured_domains = None
+    
     @staticmethod
     def available_domains() -> List[str]:
         """
@@ -59,6 +62,17 @@ class EnergyDevice:
                  argument to the :py:meth:`pyJoules.energy_device.EnergyDevice.configure` method.
         """
         raise NotImplementedError()
+
+    def get_configured_domains(self):
+        """
+        Get the domains that was passed as argument to the configure function
+        :return: A list of EnergyDomain
+        :raise NotConfiguredDeviceException: if the device was not configured
+        """
+        if self._configured_domains is None:
+            raise NotConfiguredDeviceException
+
+        return self._configured_domains
 
 
 class EnergyDeviceFactory:
