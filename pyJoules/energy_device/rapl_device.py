@@ -21,7 +21,7 @@ import os
 from typing import List
 
 from . import EnergyDevice, EnergyDomain, NotConfiguredDeviceException
-from pyJoules.exception import NoSuchEnergyDeviceError, NoSuchDomainError
+from pyJoules.exception import NoSuchEnergyDeviceError
 
 
 class RaplDomain(EnergyDomain):
@@ -90,7 +90,6 @@ class RaplDevice(EnergyDevice):
         :raise NoSuchEnergyDeviceError: if no RAPL API is available on this machine
         """
         EnergyDevice.__init__(self)
-        self._available_domains = self.available_domains()
         self._api_files = None
 
     @staticmethod
@@ -210,17 +209,9 @@ class RaplDevice(EnergyDevice):
         return api_files
 
     def configure(self, domains=None):
+        EnergyDevice.configure(self, domains)
 
-        if domains is None:
-            domains = self._available_domains
-        else:
-            # check if given domain list are available
-            for domain in domains:
-                if domain not in self._available_domains:
-                    raise NoSuchDomainError(domain)
-
-        self._configured_domains = domains
-        self._api_files = self._open_api_files(domains)
+        self._api_files = self._open_api_files(self._configured_domains)
 
     def _read_energy_value(self, api_file):
         api_file.seek(0, 0)

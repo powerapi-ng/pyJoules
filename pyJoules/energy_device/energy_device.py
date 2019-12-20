@@ -21,7 +21,7 @@
 from typing import List, Optional
 
 from . import EnergyDomain
-from ..exception import PyJoulesException
+from ..exception import PyJoulesException, NoSuchDomainError
 
 class NotConfiguredDeviceException(PyJoulesException):
     """
@@ -36,7 +36,8 @@ class EnergyDevice:
 
     def __init__(self):
         self._configured_domains = None
-    
+        self._available_domains = self.available_domains()
+
     @staticmethod
     def available_domains() -> List[str]:
         """
@@ -53,7 +54,15 @@ class EnergyDevice:
         :param domains: domains to be monitored by the device, if None, all the available domain will be monitored
         :raise NoSuchDomainError: if one given domain could not be monitored on this machine
         """
-        raise NotImplementedError()
+        if domains is None:
+            domains = self._available_domains
+        else:
+            # check if given domain list are available
+            for domain in domains:
+                if domain not in self._available_domains:
+                    raise NoSuchDomainError(domain)
+
+        self._configured_domains = domains
 
     def get_energy(self) -> List[float]:
         """
