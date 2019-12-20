@@ -131,27 +131,36 @@ class EnergyState:
         indicate if the current state is the last state of the trace or not
         :return: True if the current state is the last state of the trace False otherwise
         """
-        raise NotImplementedError()
+        return self.next_state is None
 
     def compute_duration(self) -> float:
         """
         :return: compute the time elipsed between the current state and the next state
         :raise NoNextStateException: if the state is the last state of the trace
         """
-        raise NotImplementedError()
+        if self.next_state is None:
+            raise NoNextStateException()
+
+        return self.next_state.timestamp - self.timestamp
 
     def compute_energy(self) -> List[float]:
         """
         :return: compute the energy consumed between the current state and the next state
         :raise NoNextStateException: if the state is the last state of the trace
         """
-        raise NotImplementedError()
+        if self.next_state is None:
+            raise NoNextStateException()
+
+        return [v_next - v_current for (v_next, v_current) in zip(self.next_state.values, self.values)]
 
     def add_next_state(self, state: EnergyState):
         """
         :param previous: next state for the same energy trace
+        :raise StateIsNotFinalError: if there are already a next state
         """
-        raise NotImplementedError()
+        if self.next_state is not None:
+            raise StateIsNotFinalError()
+        self.next_state = state
 
 
 def measureit(handler: EnergyHandler, domains: List[EnergyDomain]):

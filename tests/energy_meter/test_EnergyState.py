@@ -42,7 +42,7 @@ def alone_state():
 def two_states(alone_state):
     state2 = EnergyState(TS_SECOND, 'second', [E_SECOND_DOMAIN0, E_SECOND_DOMAIN1])
     alone_state.add_next_state(state2)
-    return state2
+    return alone_state
 
 
 ###########
@@ -72,19 +72,20 @@ def test_compute_energy_from_last_state_raise_NoNextStateException(alone_state):
 
 
 def test_compute_duration_between_two_state_return_correct_values(two_states):
-    assert two_states.compute_duration == TS_SECOND - TS_FIRST
+    print(two_states.next_state)
+    assert two_states.compute_duration() == TS_SECOND - TS_FIRST
 
 
 def test_compute_energy_between_two_state_return_correct_values(two_states):
     energy = two_states.compute_energy()
     assert len(energy) == 2
-    assert energy[0] == E_FIRST_DOMAIN1 - E_FIRST_DOMAIN0
-    assert energy[1] == E_SECOND_DOMAIN1 - E_SECOND_DOMAIN0
+    assert energy[0] == E_SECOND_DOMAIN0 - E_FIRST_DOMAIN0
+    assert energy[1] == E_SECOND_DOMAIN1 - E_FIRST_DOMAIN1
 
 
 ##################
 # ADD_NEXT_STATE #
 ##################
-def test_add_a_state_to_non_final_state_raise_StateIsNotFinalException(two_states):
+def test_add_a_state_to_non_final_state_raise_StateIsNotFinalError(two_states):
     with pytest.raises(StateIsNotFinalError):
         two_states.add_next_state(EnergyState(1, 'third', [1, 2]))
