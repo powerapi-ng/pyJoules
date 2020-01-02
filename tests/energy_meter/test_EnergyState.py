@@ -35,12 +35,12 @@ E_SECOND_DOMAIN1 = 9.4
 
 @pytest.fixture
 def alone_state():
-    return EnergyState(TS_FIRST, 'first', [E_FIRST_DOMAIN0, E_FIRST_DOMAIN1])
+    return EnergyState(TS_FIRST, 'first', [[E_FIRST_DOMAIN0, E_FIRST_DOMAIN1]])
 
 
 @pytest.fixture
 def two_states(alone_state):
-    state2 = EnergyState(TS_SECOND, 'second', [E_SECOND_DOMAIN0, E_SECOND_DOMAIN1])
+    state2 = EnergyState(TS_SECOND, 'second', [[E_SECOND_DOMAIN0, E_SECOND_DOMAIN1]])
     alone_state.add_next_state(state2)
     return alone_state
 
@@ -68,7 +68,7 @@ def test_compute_duration_from_last_state_raise_NoNextStateException(alone_state
 
 def test_compute_energy_from_last_state_raise_NoNextStateException(alone_state):
     with pytest.raises(NoNextStateException):
-        alone_state.compute_energy()
+        alone_state.compute_energy([])
 
 
 def test_compute_duration_between_two_state_return_correct_values(two_states):
@@ -77,10 +77,10 @@ def test_compute_duration_between_two_state_return_correct_values(two_states):
 
 
 def test_compute_energy_between_two_state_return_correct_values(two_states):
-    energy = two_states.compute_energy()
+    energy = two_states.compute_energy(['domain0', 'domain1'])
     assert len(energy) == 2
-    assert energy[0] == E_SECOND_DOMAIN0 - E_FIRST_DOMAIN0
-    assert energy[1] == E_SECOND_DOMAIN1 - E_FIRST_DOMAIN1
+    assert energy['domain0'] == E_SECOND_DOMAIN0 - E_FIRST_DOMAIN0
+    assert energy['domain1'] == E_SECOND_DOMAIN1 - E_FIRST_DOMAIN1
 
 
 ##################

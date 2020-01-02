@@ -18,6 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from __future__ import annotations
+
+import time
+import operator
+
+from functools import reduce
 from typing import List, Optional
 
 from .exception import PyJoulesException
@@ -42,9 +47,9 @@ class EnergyMeterNotStartedError(PyJoulesException):
     """
 
 
-class EnergyMeterNotStopedError(PyJoulesException):
+class EnergyMeterNotStoppedError(PyJoulesException):
     """
-    Exception raised when trying to get energy samples from non stoped EnergyMeter instance
+    Exception raised when trying to get energy samples from non stopped EnergyMeter instance
     """
 
 
@@ -64,13 +69,26 @@ class EnergyMeter:
         :param devices: list of the monitored devices
         :param default_tag: tag given if no tag were given to a measure
         """
+        self.devices = devices
+        self.default_tag = default_tag
+
+        self._last_state = None
+        self._first_state = None
+
+    def _measure_new_state(self, tag):
+        timestamp = time.perf_counter()
+        values = [device.get_energy() for device in self.devices]
+
+        return EnergyState(timestamp, tag if tag is not None else self.default_tag, values)
 
     def start(self, tag: Optional[str] = None):
         """
         Begin a new energy trace
         :param tag: sample name
         """
-        raise NotImplementedError()
+        new_state = self._measure_new_state(tag)
+        self._first_state = new_state
+        self._last_state = new_state
 
     def record(self, tag: Optional[str] = None):
         """
@@ -78,35 +96,72 @@ class EnergyMeter:
         :param tag: sample name
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
-        raise NotImplementedError()
+        if self._first_state is None:
+            raise EnergyMeterNotStartedError()
+
+        new_state = self._measure_new_state(tag)
+        self._last_state.add_next_state(new_state)
+        self._last_state = new_state
 
     def stop(self):
         """
         Set the end of the energy trace
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
-        raise NotImplementedError()
+        if self._first_state is None:
+            raise EnergyMeterNotStartedError()
+
+        new_state = self._measure_new_state('__stop__')
+        self._last_state.add_next_state(new_state)
+        self._last_state = new_state
 
     def get_sample(self, tag: str) -> EnergySample:
         """
         Retrieve the first sample in the trace with the given tag
         :param tag: tag of the sample to get
         :return: the sample with the given tag, if many sample have the same tag, the first sample created is returned
-        :raise EnergyMeterNotStopedError: if the energy meter isn't stoped
+        :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
         :raise SampleNotFoundError: if the trace doesn't contains a sample with the given tag name
         """
-        raise NotImplementedError()
+        if self._first_state is None:
+            raise EnergyMeterNotStartedError()
+
+        if not self._last_state.tag == '__stop__':
+            raise EnergyMeterNotStoppedError()
+
+        for sample in self:
+            if sample.tag == tag:
+                return sample
+        raise SampleNotFoundError()
 
     def __iter__(self):
         """
         iterate on the energy sample of the last trace
-        :raise EnergyMeterNotStopedError: if the energy meter isn't stoped
+        :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
         """
-        raise NotImplementedError()
+        if self._first_state is None:
+            raise EnergyMeterNotStartedError()
+
+        if not self._last_state.tag == '__stop__':
+            raise EnergyMeterNotStoppedError()
+
+        return SampleIterator(self)
+
+class SampleIterator:
+
+    def __init__(self, energy_meter):
+        self.energy_meter = energy_meter
+        self._current_state = energy_meter._first_state
 
     def __next__(self):
-        raise NotImplementedError()
+        if self._current_state.next_state is None:
+            raise StopIteration()
 
+        domains = reduce(operator.add, [device.get_configured_domains() for device in self.energy_meter.devices])
+        sample = EnergySample(self._current_state.timestamp, self._current_state.tag,
+                              self._current_state.compute_duration(), self._current_state.compute_energy(domains))
+        self._current_state = self._current_state.next_state
+        return sample
 
 class EnergyState:
     """
@@ -143,7 +198,7 @@ class EnergyState:
 
         return self.next_state.timestamp - self.timestamp
 
-    def compute_energy(self) -> List[float]:
+    def compute_energy(self, domains) -> List[float]:
         """
         :return: compute the energy consumed between the current state and the next state
         :raise NoNextStateException: if the state is the last state of the trace
@@ -151,7 +206,14 @@ class EnergyState:
         if self.next_state is None:
             raise NoNextStateException()
 
-        return [v_next - v_current for (v_next, v_current) in zip(self.next_state.values, self.values)]
+        energy = []
+        for next_device_values, current_device_values in zip(self.next_state.values, self.values):
+            energy += [v_next - v_current for v_next, v_current in zip(next_device_values, current_device_values)]
+
+        values_dict = {}
+        for value, key in zip(energy, domains):
+            values_dict[str(key)] = value
+        return values_dict
 
     def add_next_state(self, state: EnergyState):
         """
