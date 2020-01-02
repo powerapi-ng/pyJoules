@@ -134,6 +134,12 @@ class EnergyMeter:
                 return sample
         raise SampleNotFoundError()
 
+    def _get_domain_list(self):
+        """
+        return the list of all monitored domains for each monitored energy devices
+        """
+        return reduce(operator.add, [device.get_configured_domains() for device in self.devices])
+
     def __iter__(self):
         """
         iterate on the energy sample of the last trace
@@ -144,24 +150,26 @@ class EnergyMeter:
 
         if not self._last_state.tag == '__stop__':
             raise EnergyMeterNotStoppedError()
-
-        return SampleIterator(self)
+        domains = self._get_domain_list()
+        return SampleIterator(self._first_state, domains)
 
 class SampleIterator:
 
-    def __init__(self, energy_meter):
-        self.energy_meter = energy_meter
-        self._current_state = energy_meter._first_state
+    def __init__(self, first_state, domains):
+        self.domains = domains
+        self._current_state = first_state
+
+    def _gen_sample(self, state):
+        return EnergySample(state.timestamp, state.tag, state.compute_duration(), state.compute_energy(self.domains))
 
     def __next__(self):
         if self._current_state.next_state is None:
             raise StopIteration()
 
-        domains = reduce(operator.add, [device.get_configured_domains() for device in self.energy_meter.devices])
-        sample = EnergySample(self._current_state.timestamp, self._current_state.tag,
-                              self._current_state.compute_duration(), self._current_state.compute_energy(domains))
+        sample = self._gen_sample(self._current_state)
         self._current_state = self._current_state.next_state
         return sample
+
 
 class EnergyState:
     """
@@ -184,7 +192,7 @@ class EnergyState:
     def is_last(self) -> bool:
         """
         indicate if the current state is the last state of the trace or not
-        :return: True if the current state is the last state of the trace False otherwise
+         :return: True if the current state is the last state of the trace False otherwise
         """
         return self.next_state is None
 
@@ -207,8 +215,9 @@ class EnergyState:
             raise NoNextStateException()
 
         energy = []
-        for next_device_values, current_device_values in zip(self.next_state.values, self.values):
-            energy += [v_next - v_current for v_next, v_current in zip(next_device_values, current_device_values)]
+        for next_state_device, current_state_device in zip(self.next_state.values, self.values):
+            for next_value, current_value in zip(next_state_device, current_state_device):
+                energy.append(next_value - current_value)
 
         values_dict = {}
         for value, key in zip(energy, domains):
