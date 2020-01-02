@@ -19,8 +19,10 @@
 # SOFTWARE.
 
 import os
+import random
 import pytest
 import pyfakefs
+
 
 SOCKET_0_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:0'
 SOCKET_1_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:1'
@@ -45,6 +47,27 @@ CORE_0_FILE_NAME = CORE_0_DIR_NAME + '/energy_uj'
 CORE_1_FILE_NAME = CORE_1_DIR_NAME + '/energy_uj'
 
 
+class RaplFS():
+
+    def __init__(self, fs):
+        self.fs = fs
+        self.domains_current_energy = {}
+        self.domains_energy_file = {}
+
+    def add_domain(self, domain_dir_name, domain_name, domain_id):
+        self.fs.create_file(domain_dir_name + '/name', contents=domain_name + '\n')
+        energy_value = random.random()
+        self.fs.create_file(domain_dir_name + '/energy_uj', contents=str(energy_value) + '\n')
+        self.domains_energy_file[domain_id] = domain_dir_name + '/energy_uj'
+        self.domains_current_energy[domain_id] = energy_value
+
+    def reset_values(self):
+        new_val = random.random()
+        for key in self.domains_energy_file:
+            self.domains_current_energy[key] = new_val
+            with open(self.domains_energy_file[key], 'w') as energy_file:
+                energy_file.write(str(new_val) + '\n')
+
 
 
 @pytest.fixture
@@ -52,9 +75,7 @@ def empty_fs(fs):
     """
     filesystem describing a machine with one CPU but no RAPL API
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-    return fs
+    return RaplFS(fs)
 
 
 @pytest.fixture
@@ -62,13 +83,9 @@ def fs_pkg_one_socket(fs):
     """
     filesystem describing a machine with one CPU and RAPL API for package
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    return fs
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    return rapl_fs
 
 
 @pytest.fixture
@@ -76,15 +93,11 @@ def fs_pkg_dram_one_socket(fs):
     """
     filesystem describing a machine with one CPU and RAPL API for package and dram
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
 
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(DRAM_0_DIR_NAME + '/name', contents='dram\n')
-    fs.create_file(DRAM_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-    return fs
+    return rapl_fs
 
 
 @pytest.fixture
@@ -92,15 +105,10 @@ def fs_pkg_psys_one_socket(fs):
     """
     filesystem describing a machine with one CPU and RAPL API for package and psys
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:1/name', contents='psys\n')
-    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:1/energy_uj', contents='0\n')
-    return fs
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain('/sys/class/powercap/intel-rapl/intel-rapl:1', 'psys', 'psys')
+    return rapl_fs
 
 
 @pytest.fixture
@@ -108,36 +116,22 @@ def fs_pkg_dram_core_one_socket(fs):
     """
     filesystem describing a machine with one CPU and RAPL API for package dram and core
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(DRAM_0_DIR_NAME + '/name', contents='dram\n')
-    fs.create_file(DRAM_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-
-    fs.create_file(CORE_0_DIR_NAME + '/name', contents='core\n')
-    fs.create_file(CORE_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-    return fs
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
+    rapl_fs.add_domain(CORE_0_DIR_NAME, 'core', 'core_0')
+    return rapl_fs
 
 @pytest.fixture
 def fs_pkg_dram_uncore_one_socket(fs):
     """
     filesystem describing a machine with one CPU and RAPL API for package dram and core
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(DRAM_0_DIR_NAME + '/name', contents='dram\n')
-    fs.create_file(DRAM_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-
-    fs.create_file(CORE_0_DIR_NAME + '/name', contents='uncore\n')
-    fs.create_file(CORE_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-    return fs
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
+    rapl_fs.add_domain(CORE_0_DIR_NAME, 'uncore', 'uncore_0')
+    return rapl_fs
 
 
 @pytest.fixture
@@ -145,17 +139,11 @@ def fs_pkg_two_socket(fs):
     """
     filesystem describing a machine with two CPU and RAPL API for package
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0-1')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu1/topology/physical_package_id', contents='1')
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain(SOCKET_1_DIR_NAME, 'package-1', 'package_1')
 
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(SOCKET_1_DIR_NAME + '/name', contents='package-1\n')
-    fs.create_file(PKG_1_FILE_NAME, contents=str(PKG_1_VALUE) + '\n')
-
-    return fs
+    return rapl_fs
 
 
 @pytest.fixture
@@ -163,22 +151,13 @@ def fs_pkg_dram_two_socket(fs):
     """
     filesystem describing a machine with two CPU and RAPL API for package and dram
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0-1')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu1/topology/physical_package_id', contents='1')
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain(SOCKET_1_DIR_NAME, 'package-1', 'package_1')
+    rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
+    rapl_fs.add_domain(DRAM_1_DIR_NAME, 'dram', 'dram_1')
 
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(DRAM_0_DIR_NAME + '/name', contents='dram\n')
-    fs.create_file(DRAM_0_FILE_NAME, contents=str(DRAM_0_VALUE) + '\n')
-
-    fs.create_file(SOCKET_1_DIR_NAME + '/name', contents='package-1\n')
-    fs.create_file(PKG_1_FILE_NAME, contents=str(PKG_1_VALUE) + '\n')
-
-    fs.create_file(DRAM_1_DIR_NAME + '/name', contents='dram\n')
-    fs.create_file(DRAM_1_FILE_NAME, contents=str(DRAM_1_VALUE) + '\n')
-    return fs
+    return rapl_fs
 
 
 @pytest.fixture
@@ -186,17 +165,10 @@ def fs_pkg_psys_two_socket(fs):
     """
     filesystem describing a machine with two CPU and RAPL API for package
     """
-    fs.create_file('/sys/devices/system/cpu/present', contents='0-1')
-    fs.create_file('/sys/devices/system/cpu/cpu0/topology/physical_package_id', contents='0')
-    fs.create_file('/sys/devices/system/cpu/cpu1/topology/physical_package_id', contents='1')
+    rapl_fs = RaplFS(fs)
+    rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.add_domain(SOCKET_1_DIR_NAME, 'package-1', 'package_1')
 
-    fs.create_file(SOCKET_0_DIR_NAME + '/name', contents='package-0\n')
-    fs.create_file(PKG_0_FILE_NAME, contents=str(PKG_0_VALUE) + '\n')
-
-    fs.create_file(SOCKET_1_DIR_NAME + '/name', contents='package-1\n')
-    fs.create_file(PKG_1_FILE_NAME, contents=str(PKG_1_VALUE) + '\n')
-
-    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:2/name', contents='psys\n')
-    fs.create_file('/sys/class/powercap/intel-rapl/intel-rapl:2/energy_uj', contents='0\n')
+    rapl_fs.add_domain('/sys/class/powercap/intel-rapl/intel-rapl:2/name', 'psys', 'psys')
 
     return fs
