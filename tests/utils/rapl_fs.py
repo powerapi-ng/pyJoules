@@ -23,6 +23,8 @@ import random
 import pytest
 import pyfakefs
 
+from .fake_api import FakeAPI
+
 
 SOCKET_0_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:0'
 SOCKET_1_DIR_NAME = '/sys/class/powercap/intel-rapl/intel-rapl:1'
@@ -47,7 +49,7 @@ CORE_0_FILE_NAME = CORE_0_DIR_NAME + '/energy_uj'
 CORE_1_FILE_NAME = CORE_1_DIR_NAME + '/energy_uj'
 
 
-class RaplFS():
+class RaplFS(FakeAPI):
 
     def __init__(self, fs):
         self.fs = fs
@@ -62,8 +64,8 @@ class RaplFS():
         self.domains_current_energy[domain_id] = energy_value
 
     def reset_values(self):
-        new_val = random.random()
         for key in self.domains_energy_file:
+            new_val = random.random()
             self.domains_current_energy[key] = new_val
             with open(self.domains_energy_file[key], 'w') as energy_file:
                 energy_file.write(str(new_val) + '\n')

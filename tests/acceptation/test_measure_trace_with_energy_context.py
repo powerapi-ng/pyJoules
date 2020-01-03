@@ -27,33 +27,30 @@ from mock import patch
 
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
 from pyJoules.energy_meter import EnergyMeter
-from ..utils.rapl_fs import fs_pkg_dram_one_socket
-from ..utils.fake_api import CorrectTraceGenerator
+from .. utils.rapl_fs import fs_pkg_dram_one_socket
+from .. utils.fake_api import CorrectTraceGenerator
 from ..utils.sample import assert_sample_are_equals
-
 
 TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
 
-
+@patch('pyJoules.energy_handler.EnergyHandler')
 @patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_all_domains(_mocked_perf_counter, fs_pkg_dram_one_socket):
+def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket):
+
     domains = [RaplPackageDomain(0), RaplDramDomain(0)]
 
     correct_trace_generator = CorrectTraceGenerator(domains, fs_pkg_dram_one_socket, TIMESTAMP_TRACE)  # test
 
-    device = RaplDevice()
-    device.configure(domains=domains)
-    meter = EnergyMeter([device])
-    meter.start(tag="foo")
 
-    correct_trace_generator.reset_fake_api_values()  # test
+    with EnergyContext(mocked_handler, domains) as energy_context:
+        correct_trace_generator.reset_fake_api_values()  # test
+        energy_context.record(tag="bar")
+        correct_trace_generator.reset_fake_api_values()  # test
 
-    meter.record(tag="bar")
-
-    correct_trace_generator.reset_fake_api_values()  # test
-
-    meter.stop()
+    assert mocked_handler.process.call_count == 2   # test
 
     correct_trace = correct_trace_generator.generate_correct_trace(['foo', 'bar'])  # test
-    for sample1, sample2 in zip(correct_trace, meter):  # test
-        assert_sample_are_equals(sample1, sample2)  # test
+    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_arg_list):  # test
+        measured_sample = processed_arg[0][0]  # test
+        assert_sample_are_equals(correct_sample, measured_sample)  # test
+

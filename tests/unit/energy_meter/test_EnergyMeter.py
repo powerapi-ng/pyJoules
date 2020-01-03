@@ -24,7 +24,7 @@ from mock import patch
 from pyJoules.energy_meter import EnergyMeter, EnergySample
 from pyJoules.energy_meter import EnergyMeterNotStartedError, EnergyMeterNotStoppedError, SampleNotFoundError
 from pyJoules.energy_device import EnergyDevice, EnergyDomain
-
+from ...utils.sample import assert_sample_are_equals
 
 DEVICE1_ENERGY_TRACE = [[1.0, 1.1],
                         [2.0, 2.2],
@@ -149,17 +149,6 @@ def test_iter_on_one_sample_trace_should_return_one_sample(energy_meter):
         samples.append(sample)
 
     assert len(samples) == 1
-
-
-def assert_sample_are_equals(sample1, sample2):
-    assert sample1.timestamp == sample2.timestamp
-    assert sample1.tag == sample2.tag
-    assert sample1.duration == sample2.duration
-
-    assert len(sample1.energy) == len(sample2.energy)
-    for key in sample1.energy:
-        assert key in sample2.energy
-        assert sample1.energy[key] == sample2.energy[key]
 
 
 @pytest.fixture
