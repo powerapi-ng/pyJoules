@@ -20,3 +20,4 @@
 
 from .energy_domain import EnergyDomain
 from .energy_device import EnergyDevice, EnergyDeviceFactory, NotConfiguredDeviceException
+from .energy_device_factory import EnergyDeviceFactory

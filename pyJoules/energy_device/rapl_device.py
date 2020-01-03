@@ -31,6 +31,9 @@ class RaplDomain(EnergyDomain):
         self.socket = socket
         self._repr = self.get_domain_name() + '_' + str(socket)
 
+    def get_device_type(self):
+        return RaplDevice
+        
     def get_domain_name(self) -> str:
         """
         :return: domain name without socket identifier

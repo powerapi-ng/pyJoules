@@ -26,3 +26,6 @@ class EnergyDomain:
 
     def __repr__(self) -> str:
         raise NotImplementedError()
+
+    def get_device_type(self):
+        raise NotImplementedError()

@@ -20,7 +20,7 @@
 
 import pytest
 
-from pyJoules.energy_device.rapl_device import RaplCoreDomain, RaplDramDomain, RaplPackageDomain, RaplUncoreDomain
+from pyJoules.energy_device.rapl_device import RaplDevice, RaplCoreDomain, RaplDramDomain, RaplPackageDomain, RaplUncoreDomain
 
 
 @pytest.fixture(params=[-1, 0, 1])
@@ -48,3 +48,21 @@ def test_package_repr_return_package_underscore_socket_id(integer_value):
 def test_dram_repr_return_dram_underscore_socket_id(integer_value):
     domain = RaplDramDomain(integer_value)
     assert str(domain) == 'dram_' + str(integer_value)
+
+def test_uncore_get_device_type_return_RaplDevice():
+    domain = RaplUncoreDomain(0)
+    assert domain.get_device_type() == RaplDevice
+
+def test_core_get_device_type_return_RaplDevice():
+    domain = RaplCoreDomain(0)
+    assert domain.get_device_type() == RaplDevice
+
+
+def test_package_get_device_type_return_RaplDevice():
+    domain = RaplPackageDomain(0)
+    assert domain.get_device_type() == RaplDevice
+
+
+def test_dram_get_device_type_return_RaplDevice():
+    domain = RaplDramDomain(0)
+    assert domain.get_device_type() == RaplDevice
