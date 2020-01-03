@@ -82,15 +82,3 @@ class EnergyDevice:
             raise NotConfiguredDeviceException
 
         return self._configured_domains
-
-
-class EnergyDeviceFactory:
-
-    @staticmethod
-    def create(domains: List[EnergyDomain]) -> List[EnergyDevice]:
-        """
-        return a list of devices that configured to monitor the given energy domains
-        :param domains: list of energy domains to monitor
-        :return: a list of energy devices configured to monitor the given energy domains
-        """
-        raise NotImplementedError()

@@ -33,7 +33,7 @@ class RaplDomain(EnergyDomain):
 
     def get_device_type(self):
         return RaplDevice
-        
+
     def get_domain_name(self) -> str:
         """
         :return: domain name without socket identifier
@@ -47,7 +47,7 @@ class RaplDomain(EnergyDomain):
         return self._repr
 
     def __eq__(self, other) -> bool:
-        return self.__repr__() == other.__repr__()
+        return isinstance(other, RaplDomain) and self.__repr__() == other.__repr__()
 
     def __lt__(self, other) -> bool:
         if isinstance(other, RaplDomain):

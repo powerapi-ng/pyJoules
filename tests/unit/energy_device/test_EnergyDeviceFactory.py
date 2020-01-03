@@ -18,6 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_domain import EnergyDomain
-from .energy_device import EnergyDevice, NotConfiguredDeviceException
-from .energy_device_factory import EnergyDeviceFactory
+from pyJoules.energy_device import EnergyDeviceFactory
+from pyJoules.energy_device.rapl_device import RaplPackageDomain, RaplDramDomain, RaplDevice
+
+def test_create_devices_with_one_rapl_package_domain_return_one_correctly_configured_rapl_device():
+    domains = [RaplPackageDomain(0)]
+    devices = EnergyDeviceFactory.create_devices(domains)
+
+    assert len(devices) == 1
+    assert isinstance(devices[0], RaplDevice)
+    assert devices[0].get_configured_domains() == domains
+
+
+def test_create_devices_with_rapl_package_and_dram_domains_return_one_correctly_configured_rapl_device():
+    domains = [RaplPackageDomain(0), RaplDramDomain(0)]
+    devices = EnergyDeviceFactory.create_devices(domains)
+
+    assert len(devices) == 1
+    assert isinstance(devices[0], RaplDevice)
+    assert devices[0].get_configured_domains() == domains

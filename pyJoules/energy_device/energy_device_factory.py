@@ -18,6 +18,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_domain import EnergyDomain
-from .energy_device import EnergyDevice, NotConfiguredDeviceException
-from .energy_device_factory import EnergyDeviceFactory
+from typing import List
+
+from . import EnergyDomain, EnergyDevice
+
+
+class EnergyDeviceFactory:
+
+    @staticmethod
+    def create_devices(domains: EnergyDomain) -> List[EnergyDevice]:
+        """
+        Create and configure the EnergyDevice instance with the given EnergyDomains
+        :param domains: a list of EnergyDomain instance that as to be monitored
+        :return: a list of device configured with the given EnergyDomains
+        """
+        grouped_domains = {}
+        for device_type, domain in map(lambda d: (d.get_device_type(), d), domains):
+            if device_type in grouped_domains:
+                grouped_domains[device_type].append(domain)
+            else:
+                grouped_domains[device_type] = [domain]
+
+        devices = []
+
+        for device_type in grouped_domains:
+            device = device_type()
+            device.configure(domains=grouped_domains[device_type])
+            devices.append(device)
+        return devices
