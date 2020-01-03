@@ -26,7 +26,7 @@ import pytest
 from mock import patch
 
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
-from pyJoules.energy_meter import EnergyMeter
+from pyJoules.energy_meter import EnergyMeter, EnergyContext
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
 from .. utils.fake_api import CorrectTraceGenerator
 from ..utils.sample import assert_sample_are_equals

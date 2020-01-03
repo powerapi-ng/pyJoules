@@ -26,7 +26,7 @@ from functools import reduce
 from typing import List, Optional
 
 from .exception import PyJoulesException
-from .energy_device import EnergyDevice, EnergyDomain
+from .energy_device import EnergyDevice, EnergyDomain, EnergyDeviceFactory
 from .energy_handler import EnergyHandler
 from . import EnergySample
 
@@ -246,13 +246,16 @@ def measureit(handler: EnergyHandler, domains: List[EnergyDomain]):
 class EnergyContext():
 
     def __init__(self, handler: EnergyHandler, domains: List[EnergyDomain]):
-        raise NotImplementedError()
+        self.handler = handler
 
-    def record(self, tag: Optional[str]):
-        raise NotImplementedError()
+        devices = EnergyDeviceFactory.create_devices(domains)
+        self.energy_meter = EnergyMeter(devices)
 
     def __enter__(self) -> EnergyMeter:
-        raise NotImplementedError()
+        self.energy_meter.start()
+        return self.energy_meter
 
     def __exit__(self, type, value, traceback):
-        raise NotImplementedError()
+        self.energy_meter.stop()
+        for sample in self.energy_meter:
+            self.handler.process(sample)
