@@ -27,7 +27,7 @@ from pyJoules.energy_device.rapl_device import RaplPackageDomain, RaplDramDomain
 from ...utils.rapl_fs import fs_pkg_one_socket, fs_pkg_dram_one_socket
 
 
-def test_create_devices_with_one_rapl_package_domain_return_one_correctly_configured_rapl_device():
+def test_create_devices_with_one_rapl_package_domain_return_one_correctly_configured_rapl_device(fs_pkg_dram_one_socket):
     domains = [RaplPackageDomain(0)]
     devices = EnergyDeviceFactory.create_devices(domains)
 
@@ -36,7 +36,7 @@ def test_create_devices_with_one_rapl_package_domain_return_one_correctly_config
     assert devices[0].get_configured_domains() == domains
 
 
-def test_create_devices_with_rapl_package_and_dram_domains_return_one_correctly_configured_rapl_device():
+def test_create_devices_with_rapl_package_and_dram_domains_return_one_correctly_configured_rapl_device(fs_pkg_dram_one_socket):
     domains = [RaplPackageDomain(0), RaplDramDomain(0)]
     devices = EnergyDeviceFactory.create_devices(domains)
 

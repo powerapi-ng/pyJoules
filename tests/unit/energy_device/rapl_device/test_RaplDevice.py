@@ -98,7 +98,7 @@ def test_configure_device_to_get_pkg_energy_on_cpu1_with_no_cpu1_raise_NoSuchDom
     with pytest.raises(NoSuchDomainError):
         device.configure([RaplPackageDomain(1)])
 
-def test_get_configured_domains_on_non_configured_device_raise_NotConfiguredDeviceException():
+def test_get_configured_domains_on_non_configured_device_raise_NotConfiguredDeviceException(fs_pkg_dram_one_socket):
     device = RaplDevice()
 
     with pytest.raises(NotConfiguredDeviceException):
