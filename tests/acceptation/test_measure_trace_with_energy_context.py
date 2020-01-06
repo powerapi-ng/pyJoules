@@ -1,4 +1,4 @@
-# MIT License
+ # MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
 # All rights reserved.
@@ -42,15 +42,15 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
     correct_trace_generator = CorrectTraceGenerator(domains, fs_pkg_dram_one_socket, TIMESTAMP_TRACE)  # test
 
 
-    with EnergyContext(mocked_handler, domains) as energy_context:
+    with EnergyContext(mocked_handler, domains, start_tag='foo') as energy_context:
         correct_trace_generator.reset_fake_api_values()  # test
-        energy_context.record(tag="bar")
+        energy_context.record(tag='bar')
         correct_trace_generator.reset_fake_api_values()  # test
 
     assert mocked_handler.process.call_count == 2   # test
 
     correct_trace = correct_trace_generator.generate_correct_trace(['foo', 'bar'])  # test
-    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_arg_list):  # test
+    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
         measured_sample = processed_arg[0][0]  # test
-        assert_sample_are_equals(correct_sample, measured_sample)  # test
 
+        assert_sample_are_equals(correct_sample, measured_sample)  # test

@@ -53,6 +53,6 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
     assert returned_value == 2
 
     correct_trace = correct_trace_generator.generate_correct_trace(['measured_function'])  # test
-    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_arg_list):  # test
+    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
         measured_sample = processed_arg[0][0]  # test
         assert_sample_are_equals(correct_sample, measured_sample)  # test

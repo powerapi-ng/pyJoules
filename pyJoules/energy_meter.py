@@ -261,14 +261,15 @@ def measureit(handler: EnergyHandler, domains: List[EnergyDomain]):
 
 class EnergyContext():
 
-    def __init__(self, handler: EnergyHandler, domains: List[EnergyDomain]):
+    def __init__(self, handler: EnergyHandler, domains: Optional[List[EnergyDomain]] = None, start_tag='start'):
         self.handler = handler
+        self.start_tag = start_tag
 
         devices = EnergyDeviceFactory.create_devices(domains)
         self.energy_meter = EnergyMeter(devices)
 
     def __enter__(self) -> EnergyMeter:
-        self.energy_meter.start()
+        self.energy_meter.start(self.start_tag)
         return self.energy_meter
 
     def __exit__(self, type, value, traceback):
