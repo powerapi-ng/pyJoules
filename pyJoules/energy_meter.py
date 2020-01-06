@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import time
 import operator
+import functools
 
 from functools import reduce
 from typing import List, Optional
@@ -240,7 +241,22 @@ def measureit(handler: EnergyHandler, domains: List[EnergyDomain]):
     :param handler: handler instance that will receive the power consummation data
     :param domains: list of the monitored energy domains
     """
-    raise NotImplementedError()
+    def decorator_measure_energy(func):
+
+        devices = EnergyDeviceFactory.create_devices(domains)
+        energy_meter = EnergyMeter(devices)
+
+        @functools.wraps(func)
+        def wrapper_measure(*args, **kwargs):
+            energy_meter.start(tag=func.__name__)
+            val = func(*args, **kwargs)
+            energy_meter.stop()
+            for sample in energy_meter:
+                handler.process(sample)
+            return val
+        return wrapper_measure
+
+    return decorator_measure_energy
 
 
 class EnergyContext():
