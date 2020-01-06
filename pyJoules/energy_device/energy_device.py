@@ -39,7 +39,7 @@ class EnergyDevice:
         self._available_domains = self.available_domains()
 
     @staticmethod
-    def available_domains() -> List[str]:
+    def available_domains() -> List[EnergyDomain]:
         """
         Returns names of the domain that could be monitored on the Device
         :return: a list of domain names

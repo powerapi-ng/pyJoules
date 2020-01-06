@@ -18,20 +18,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import List
-
+from typing import List, Optional
+from operator import add
 from . import EnergyDomain, EnergyDevice
+from .rapl_device import RaplDevice
+
+from functools import reduce
 
 
 class EnergyDeviceFactory:
 
     @staticmethod
-    def create_devices(domains: EnergyDomain) -> List[EnergyDevice]:
+    def _gen_all_available_domains() -> List[EnergyDevice]:
+        available_api = [RaplDevice]
+        available_domains = map(lambda api: api.available_domains(), available_api)
+        flaten_available_domain_list = reduce(add, available_domains)
+        return flaten_available_domain_list
+
+    @staticmethod
+    def create_devices(domains: Optional[EnergyDomain] = None) -> List[EnergyDevice]:
         """
         Create and configure the EnergyDevice instance with the given EnergyDomains
         :param domains: a list of EnergyDomain instance that as to be monitored
         :return: a list of device configured with the given EnergyDomains
         """
+        if domains is None:
+            domains = EnergyDeviceFactory._gen_all_available_domains()
+
         grouped_domains = {}
         for device_type, domain in map(lambda d: (d.get_device_type(), d), domains):
             if device_type in grouped_domains:

@@ -43,4 +43,3 @@ class NoSuchEnergyDeviceError(PyJoulesException):
     """
     Exception raised when a EnergyDevice that does not exist on the current machine is created
     """
-    

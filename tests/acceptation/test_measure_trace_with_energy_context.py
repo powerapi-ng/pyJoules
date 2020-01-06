@@ -54,3 +54,22 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
         measured_sample = processed_arg[0][0]  # test
 
         assert_sample_are_equals(correct_sample, measured_sample)  # test
+
+@patch('pyJoules.energy_handler.EnergyHandler')
+@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+def test_measure_rapl_device_default_values(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket):
+
+    correct_trace_generator = CorrectTraceGenerator([RaplPackageDomain(0), RaplDramDomain(0)], fs_pkg_dram_one_socket,
+                                                    TIMESTAMP_TRACE)  # test
+
+    with EnergyContext(mocked_handler) as energy_context:
+        correct_trace_generator.reset_fake_api_values()  # test
+        energy_context.record(tag='second_tag')
+        correct_trace_generator.reset_fake_api_values()  # test
+
+    assert mocked_handler.process.call_count == 2   # test
+
+    correct_trace = correct_trace_generator.generate_correct_trace(['start', 'second_tag'])  # test
+    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
+        measured_sample = processed_arg[0][0]  # test
+        assert_sample_are_equals(correct_sample, measured_sample)  # test
