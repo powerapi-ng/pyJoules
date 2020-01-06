@@ -28,7 +28,7 @@ from mock import patch
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
 from pyJoules.energy_meter import EnergyMeter, EnergyContext
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
-from .. utils.fake_api import CorrectTraceGenerator
+from .. utils.fake_api import CorrectTrace
 from ..utils.sample import assert_sample_are_equals
 
 TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
@@ -39,17 +39,16 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
 
     domains = [RaplPackageDomain(0), RaplDramDomain(0)]
 
-    correct_trace_generator = CorrectTraceGenerator(domains, fs_pkg_dram_one_socket, TIMESTAMP_TRACE)  # test
+    correct_trace = CorrectTrace(domains, fs_pkg_dram_one_socket, TIMESTAMP_TRACE)  # test
 
-
+    correct_trace.add_new_sample('foo')  # test
     with EnergyContext(mocked_handler, domains, start_tag='foo') as energy_context:
-        correct_trace_generator.reset_fake_api_values()  # test
+        correct_trace.add_new_sample('bar')  # test
         energy_context.record(tag='bar')
-        correct_trace_generator.reset_fake_api_values()  # test
+        correct_trace.add_new_sample('')  # test
 
     assert mocked_handler.process.call_count == 2   # test
 
-    correct_trace = correct_trace_generator.generate_correct_trace(['foo', 'bar'])  # test
     for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
         measured_sample = processed_arg[0][0]  # test
 
@@ -59,17 +58,17 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
 @patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
 def test_measure_rapl_device_default_values(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket):
 
-    correct_trace_generator = CorrectTraceGenerator([RaplPackageDomain(0), RaplDramDomain(0)], fs_pkg_dram_one_socket,
-                                                    TIMESTAMP_TRACE)  # test
+    correct_trace = CorrectTrace([RaplPackageDomain(0), RaplDramDomain(0)], fs_pkg_dram_one_socket,
+                                 TIMESTAMP_TRACE)  # test
 
+    correct_trace.add_new_sample('start')  # test
     with EnergyContext(mocked_handler) as energy_context:
-        correct_trace_generator.reset_fake_api_values()  # test
+        correct_trace.add_new_sample('second_tag')  # test
         energy_context.record(tag='second_tag')
-        correct_trace_generator.reset_fake_api_values()  # test
+        correct_trace.add_new_sample('')  # test
 
     assert mocked_handler.process.call_count == 2   # test
 
-    correct_trace = correct_trace_generator.generate_correct_trace(['start', 'second_tag'])  # test
     for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
         measured_sample = processed_arg[0][0]  # test
         assert_sample_are_equals(correct_sample, measured_sample)  # test

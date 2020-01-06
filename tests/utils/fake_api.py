@@ -26,7 +26,7 @@ class FakeAPI:
         raise NotImplementedError()
 
 
-class CorrectTraceGenerator:
+class CorrectTrace:
     """
     Generate the correct trace, consistent with given API
     """
@@ -37,8 +37,7 @@ class CorrectTraceGenerator:
         self.energy_states = []
         self.correct_timestamps = timestamps
         self.duration_trace = self._compute_duration_trace(timestamps)
-
-        self.energy_states.append(self._get_new_energy_values())
+        self.tag_trace = []
 
     def _get_new_energy_values(self):
         new_values = {}
@@ -54,8 +53,9 @@ class CorrectTraceGenerator:
             current_ts = next_ts
         return duration_trace
 
-    def reset_fake_api_values(self):
+    def add_new_sample(self, tag):
         self.fake_api.reset_values()
+        self.tag_trace.append(tag)
         self.energy_states.append(self._get_new_energy_values())
 
     def _compute_energy_trace(self):
@@ -69,11 +69,11 @@ class CorrectTraceGenerator:
             trace.append(sample)
         return trace
 
-    def generate_correct_trace(self, tag_trace):
+    def __iter__(self):
         trace = []
         energy_trace = self._compute_energy_trace()
-        zipped_list = zip(energy_trace, tag_trace, self.duration_trace,
+        zipped_list = zip(energy_trace, self.tag_trace, self.duration_trace,
                           self.correct_timestamps)
         for values, tag, duration, timestamp in zipped_list:
             trace.append(EnergySample(timestamp, tag, duration, values))
-        return trace
+        return trace.__iter__()
