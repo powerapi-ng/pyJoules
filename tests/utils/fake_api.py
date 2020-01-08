@@ -25,15 +25,20 @@ class FakeAPI:
     def reset_values(self):
         raise NotImplementedError()
 
+    def get_device_type(self):
+        raise NotImplementedError()
+
 
 class CorrectTrace:
     """
     Generate the correct trace, consistent with given API
     """
 
-    def __init__(self, domains, fake_api, timestamps):
+    def __init__(self, domains, fake_api_list, timestamps):
         self.domains = domains
-        self.fake_api = fake_api
+        self.fake_api = {}
+        for api in fake_api_list:
+            self.fake_api[api.get_device_type()] = api
         self.energy_states = []
         self.correct_timestamps = timestamps
         self.duration_trace = self._compute_duration_trace(timestamps)
@@ -42,7 +47,9 @@ class CorrectTrace:
     def _get_new_energy_values(self):
         new_values = {}
         for domain in self.domains:
-            new_values[str(domain)] = self.fake_api.domains_current_energy[str(domain)]
+            fake_api = self.fake_api[domain.get_device_type()]
+            
+            new_values[str(domain)] = fake_api.domains_current_energy[str(domain)]
         return new_values
 
     def _compute_duration_trace(self, timestamps):
@@ -54,7 +61,8 @@ class CorrectTrace:
         return duration_trace
 
     def add_new_sample(self, tag):
-        self.fake_api.reset_values()
+        for _, api in self.fake_api.items():
+            api.reset_values()
         self.tag_trace.append(tag)
         self.energy_states.append(self._get_new_energy_values())
 
