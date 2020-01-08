@@ -36,13 +36,13 @@ That is why we recommend to eliminate any extra programs that may alter the ener
 
 To measure the energy consumed by the machine during the execution of the function `foo()` run the following code:
 ```python
-	from pyJoules.energy_meter import measureit
+from pyJoules.energy_meter import measureit
 
-	@measureit
-	def foo():
-		# Instructions to be evaluated.
+@measureit
+def foo():
+	# Instructions to be evaluated.
 
-	foo()
+foo()
 ```
 
 This will print in the console the recorded energy consumption of all the monitorable devices during the execution of function `foo`.
@@ -53,16 +53,15 @@ You can easily configure which device to monitor using the parameters of the `me
 For example, the following example only monitors the CPU power consumption on the CPU socket `1` and the Nvidia GPU `0`.
 By default, **pyJoules** monitors all the available devices of the CPU sockets.
 ```python
-
-	from pyJoules.energy_meter import measureit
-	from pyJoules.energy_device.rapl_device import RaplPackageDomain
-	from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+from pyJoules.energy_meter import measureit
+from pyJoules.energy_device.rapl_device import RaplPackageDomain
+from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
 	
-	@measureit(domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)])
-	def foo():
-		# Instructions to be evaluated.
-
-	foo()	
+@measureit(domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)])
+def foo():
+	# Instructions to be evaluated.
+	
+foo()	
 ```
 
 You can append the following domain list to monitor them : 
@@ -79,19 +78,19 @@ If you want to handle data with different output than the standard one, you can 
 
 As an example, if you want to write the recorded energy consumption in a .csv file:
 ```python
-	from pyJoules.energy_meter import measureit
-	from pyJoules.energy_handler import CsvHandler
+from pyJoules.energy_meter import measureit
+from pyJoules.energy_handler import CsvHandler
 	
-	csv_handler = CsvHandler('result.csv')
+csv_handler = CsvHandler('result.csv')
 	
-	@measureit(handler=csv_handler)
-	def foo():
-		# Instructions to be evaluated.
+@measureit(handler=csv_handler)
+def foo():
+	# Instructions to be evaluated.
 
-	for _ in range(100):
-		foo()
+for _ in range(100):
+	foo()
 		
-	csv_output.save()
+csv_output.save()
 ```
 
 This will produce a csv file of 100 lines. Each line containing the energy
@@ -114,20 +113,19 @@ consumption. It is configurable as the decorator. For example, here we use an
 and report it in a csv file : 
 
 ```python
-
-	from pyJoules.energy_meter import EnergyContext
-	from pyJoules.energy_device.rapl_device import RaplPackageDomain
-	from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
-	from pyJoules.energy_handler import CsvHandler
+from pyJoules.energy_meter import EnergyContext
+from pyJoules.energy_device.rapl_device import RaplPackageDomain
+from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+from pyJoules.energy_handler import CsvHandler
 	
-	csv_handler = CsvHandler('result.csv')
-	
-	with EnergyContext(handler=csv_handler, domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)], start_tag='foo') as ctx
-		foo()
-		ctx.record(tag='bar')
-		bar()
+csv_handler = CsvHandler('result.csv')
 
-	csv_handler.save()
+with EnergyContext(handler=csv_handler, domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)], start_tag='foo') as ctx:
+	foo()
+	ctx.record(tag='bar')
+	bar()
+
+csv_handler.save()
 ```
 
 This will record the energy consumed :
