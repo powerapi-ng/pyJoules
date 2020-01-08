@@ -45,7 +45,7 @@ jobs:
       - run:
           name: check git tag with package version
           command: |
-            python3 -c "import os, pyJoules; exit(os.environ.get('CIRCLE_TAG', '?')[1:] != pyRAPL .__version__)"
+            python3 -c "import os, pyJoules; exit(os.environ.get('CIRCLE_TAG', '?')[1:] != pyJoules .__version__)"
       - run:
           name: prepare environment
           command: |
