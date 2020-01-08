@@ -235,7 +235,7 @@ class EnergyState:
         self.next_state = state
 
 
-def measureit(handler: EnergyHandler, domains: List[EnergyDomain]):
+def measureit(handler: EnergyHandler = None, domains: Optional[List[EnergyDomain]] = None):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
     :param handler: handler instance that will receive the power consummation data
@@ -261,7 +261,7 @@ def measureit(handler: EnergyHandler, domains: List[EnergyDomain]):
 
 class EnergyContext():
 
-    def __init__(self, handler: EnergyHandler, domains: Optional[List[EnergyDomain]] = None, start_tag='start'):
+    def __init__(self, handler: EnergyHandler = None, domains: Optional[List[EnergyDomain]] = None, start_tag='start'):
         self.handler = handler
         self.start_tag = start_tag
 
