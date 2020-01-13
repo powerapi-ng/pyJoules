@@ -17,22 +17,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from dataclasses import dataclass
-from typing import Dict
 
-@dataclass
-class EnergySample:
+import pytest
+
+from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain, NvidiaGPUDevice
+
+
+@pytest.fixture(params=[-1, 0, 1])
+def integer_value(request):
+    """parametrize a test function with negative, null and positive integers
     """
-    :var timestamp: begining timestamp
-    :vartype timestamp: float
-    :var tag: sample tag
-    :vartype tag: str
-    :var duration: duration of the sample
-    :vartype duration: float
-    :var energy: dictionary that contains the energy consumed during this sample
-    :vartype: Dict[str, float]
-    """
-    timestamp: float
-    tag: str
-    duration: float
-    energy: Dict[str, float]
+    return request.param
+
+
+def test_repr_return_nvidia_gpu_underscore_device_id(integer_value):
+    domain = NvidiaGPUDomain(integer_value)
+    assert str(domain) == 'nvidia_gpu_' + str(integer_value)
+
+
+def test_get_device_type_return_NvidiaGPUDevice():
+    domain = NvidiaGPUDomain(0)
+    assert domain.get_device_type() == NvidiaGPUDevice

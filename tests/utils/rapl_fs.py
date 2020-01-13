@@ -23,6 +23,7 @@ import random
 import pytest
 import pyfakefs
 
+from pyJoules.energy_device.rapl_device import RaplDevice
 from .fake_api import FakeAPI
 
 
@@ -70,6 +71,9 @@ class RaplFS(FakeAPI):
             with open(self.domains_energy_file[key], 'w') as energy_file:
                 energy_file.write(str(new_val) + '\n')
 
+    def get_device_type(self):
+        return RaplDevice
+
 
 
 @pytest.fixture
@@ -87,6 +91,7 @@ def fs_pkg_one_socket(fs):
     """
     rapl_fs = RaplFS(fs)
     rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
+    rapl_fs.reset_values()
     return rapl_fs
 
 
@@ -98,7 +103,7 @@ def fs_pkg_dram_one_socket(fs):
     rapl_fs = RaplFS(fs)
     rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
     rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
-
+    rapl_fs.reset_values()
     return rapl_fs
 
 
@@ -110,6 +115,7 @@ def fs_pkg_psys_one_socket(fs):
     rapl_fs = RaplFS(fs)
     rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
     rapl_fs.add_domain('/sys/class/powercap/intel-rapl/intel-rapl:1', 'psys', 'psys')
+    rapl_fs.reset_values()
     return rapl_fs
 
 
@@ -122,6 +128,7 @@ def fs_pkg_dram_core_one_socket(fs):
     rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
     rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
     rapl_fs.add_domain(CORE_0_DIR_NAME, 'core', 'core_0')
+    rapl_fs.reset_values()
     return rapl_fs
 
 @pytest.fixture
@@ -133,6 +140,7 @@ def fs_pkg_dram_uncore_one_socket(fs):
     rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
     rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
     rapl_fs.add_domain(CORE_0_DIR_NAME, 'uncore', 'uncore_0')
+    rapl_fs.reset_values()
     return rapl_fs
 
 
@@ -144,7 +152,7 @@ def fs_pkg_two_socket(fs):
     rapl_fs = RaplFS(fs)
     rapl_fs.add_domain(SOCKET_0_DIR_NAME, 'package-0', 'package_0')
     rapl_fs.add_domain(SOCKET_1_DIR_NAME, 'package-1', 'package_1')
-
+    rapl_fs.reset_values()
     return rapl_fs
 
 
@@ -158,7 +166,7 @@ def fs_pkg_dram_two_socket(fs):
     rapl_fs.add_domain(SOCKET_1_DIR_NAME, 'package-1', 'package_1')
     rapl_fs.add_domain(DRAM_0_DIR_NAME, 'dram', 'dram_0')
     rapl_fs.add_domain(DRAM_1_DIR_NAME, 'dram', 'dram_1')
-
+    rapl_fs.reset_values()
     return rapl_fs
 
 
@@ -172,5 +180,5 @@ def fs_pkg_psys_two_socket(fs):
     rapl_fs.add_domain(SOCKET_1_DIR_NAME, 'package-1', 'package_1')
 
     rapl_fs.add_domain('/sys/class/powercap/intel-rapl/intel-rapl:2/name', 'psys', 'psys')
-
+    rapl_fs.reset_values()
     return fs

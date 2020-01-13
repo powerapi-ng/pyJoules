@@ -26,8 +26,10 @@ import pytest
 from mock import patch
 
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
+from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
 from pyJoules.energy_meter import EnergyMeter, EnergyContext
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
+from ..utils.fake_nvidia_api import one_gpu_api
 from .. utils.fake_api import CorrectTrace
 from ..utils.sample import assert_sample_are_equals
 
@@ -35,11 +37,11 @@ TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
 
 @patch('pyJoules.energy_handler.EnergyHandler')
 @patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket):
+def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket, one_gpu_api):
 
-    domains = [RaplPackageDomain(0), RaplDramDomain(0)]
+    domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
 
-    correct_trace = CorrectTrace(domains, fs_pkg_dram_one_socket, TIMESTAMP_TRACE)  # test
+    correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
     correct_trace.add_new_sample('foo')  # test
     with EnergyContext(mocked_handler, domains, start_tag='foo') as energy_context:
@@ -56,10 +58,10 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
 
 @patch('pyJoules.energy_handler.EnergyHandler')
 @patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_default_values(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket):
+def test_measure_rapl_device_default_values(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket, one_gpu_api):
 
-    correct_trace = CorrectTrace([RaplPackageDomain(0), RaplDramDomain(0)], fs_pkg_dram_one_socket,
-                                 TIMESTAMP_TRACE)  # test
+    correct_trace = CorrectTrace([RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)],
+                                 [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
     correct_trace.add_new_sample('start')  # test
     with EnergyContext(mocked_handler) as energy_context:
