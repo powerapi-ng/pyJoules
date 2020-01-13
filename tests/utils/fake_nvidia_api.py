@@ -63,7 +63,7 @@ def one_gpu_api():
     fake_api.reset_values()
 
     patcher_init = patch('pynvml.nvmlInit')
-    patcher_device_count = patch('pynvml.nvmlDeviceGetCount', return_value=[0])
+    patcher_device_count = patch('pynvml.nvmlDeviceGetCount', return_value=1)
     patcher_get_handle = patch('pynvml.nvmlDeviceGetHandleByIndex', side_effect=MockedHandle)
     patcher_get_energy = patch('pynvml.nvmlDeviceGetTotalEnergyConsumption',
                                side_effect=lambda mocked_handle: fake_api.get_energy_value(mocked_handle.device_id))
@@ -85,7 +85,7 @@ def two_gpu_api():
     fake_api.reset_values()
 
     patcher_init = patch('pynvml.nvmlInit')
-    patcher_device_count = patch('pynvml.nvmlDeviceGetCount', return_value=[0, 1])
+    patcher_device_count = patch('pynvml.nvmlDeviceGetCount', return_value=2)
     patcher_get_handle = patch('pynvml.nvmlDeviceGetHandleByIndex', side_effect=MockedHandle)
     patcher_get_energy = patch('pynvml.nvmlDeviceGetTotalEnergyConsumption',
                                side_effect=lambda mocked_handle: fake_api.get_energy_value(mocked_handle.device_id))
