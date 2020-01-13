@@ -86,5 +86,5 @@ class NvidiaGPUDevice(EnergyDevice):
             raise NoSuchEnergyDeviceError()
 
         device_ids = pynvml.nvmlDeviceGetCount()
-        domains = map(lambda device_id: NvidiaGPUDomain(device_id), device_ids)
+        domains = map(lambda device_id: NvidiaGPUDomain(device_id), range(device_ids))
         return list(domains)
