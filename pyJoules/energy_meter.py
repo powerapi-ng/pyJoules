@@ -28,7 +28,7 @@ from typing import List, Optional
 
 from .exception import PyJoulesException
 from .energy_device import EnergyDevice, EnergyDomain, EnergyDeviceFactory
-from .energy_handler import EnergyHandler
+from .energy_handler import EnergyHandler, PrintHandler
 from . import EnergySample
 
 class NoNextStateException(PyJoulesException):
@@ -235,7 +235,7 @@ class EnergyState:
         self.next_state = state
 
 
-def measureit(handler: EnergyHandler = None, domains: Optional[List[EnergyDomain]] = None):
+def measureit(handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
     :param handler: handler instance that will receive the power consummation data
@@ -261,7 +261,7 @@ def measureit(handler: EnergyHandler = None, domains: Optional[List[EnergyDomain
 
 class EnergyContext():
 
-    def __init__(self, handler: EnergyHandler = None, domains: Optional[List[EnergyDomain]] = None, start_tag='start'):
+    def __init__(self, handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None, start_tag='start'):
         self.handler = handler
         self.start_tag = start_tag
 
