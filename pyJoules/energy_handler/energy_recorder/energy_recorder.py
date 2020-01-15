@@ -33,7 +33,7 @@ class EnergyRecorder(EnergyHandler):
 
         self.trace_buffer = []
 
-    def handle(self, trace):
+    def process(self, trace):
         """
         Add the trace to the buffer
         """

@@ -26,7 +26,7 @@ class EnergyHandler:
     An object that can handle the measured value of an energy trace
     """
 
-    def handle(self, trace: EnergySample):
+    def process(self, trace: EnergySample):
         """
         """
         raise NotImplementedError()
