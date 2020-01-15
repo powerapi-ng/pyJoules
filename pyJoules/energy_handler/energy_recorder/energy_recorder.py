@@ -37,6 +37,7 @@ class EnergyRecorder(EnergyHandler):
         """
         Add the trace to the buffer
         """
+        self.trace_buffer.append(sample)
 
     def save_data(self):
         """

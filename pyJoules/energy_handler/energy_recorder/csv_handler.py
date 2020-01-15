@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import os.path
 
 from . import EnergyRecorder
 
@@ -26,8 +27,35 @@ class CSVHandler(EnergyRecorder):
     def __init__(self, filename):
         EnergyRecorder.__init__(self)
 
+        self._filename = filename
+
+    def _gen_header(self):
+        domain_names = self.trace_buffer[0].energy.keys()
+        return 'timestamp;tag;duration;' + ';'.join(domain_names)
+
+    def _gen_sample_line(self, sample):
+        domain_names = self.trace_buffer[0].energy.keys()
+
+        line_begining = f'{sample.timestamp};{sample.tag};{sample.duration};'
+        energy_values = [str(sample.energy[domain]) for domain in domain_names]
+        return line_begining + ';'.join(energy_values)
+
+    def _init_file(self):
+        if os.path.exists('/file.csv'):
+            csv_file = open(self._filename, 'a+')
+            return csv_file
+        else:
+            csv_file = open(self._filename, 'w+')
+            csv_file.write(self._gen_header() + '\n')
+            return csv_file
+
     def save_data(self):
         """
         Save each trace contained in the buffer and empty the buffer
         """
-        raise NotImplementedError()
+
+        csv_file = self._init_file()
+        for sample in self.trace_buffer:
+            csv_file.write(self._gen_sample_line(sample) + '\n')
+        csv_file.close()
+        self.trace_buffer = []
