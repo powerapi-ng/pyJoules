@@ -26,11 +26,6 @@ class CSVHandler(EnergyRecorder):
     def __init__(self, filename):
         EnergyRecorder.__init__(self)
 
-    def process(self, sample):
-        """
-        Add the trace to the buffer
-        """
-
     def save_data(self):
         """
         Save each trace contained in the buffer and empty the buffer
