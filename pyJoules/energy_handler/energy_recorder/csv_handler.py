@@ -41,7 +41,7 @@ class CSVHandler(EnergyRecorder):
         return line_begining + ';'.join(energy_values)
 
     def _init_file(self):
-        if os.path.exists('/file.csv'):
+        if os.path.exists(self._filename):
             csv_file = open(self._filename, 'a+')
             return csv_file
         else:
