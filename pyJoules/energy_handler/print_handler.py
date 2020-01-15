@@ -18,5 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_handler import EnergyHandler
-from .print_handler import PrintHandler
+from functools import reduce
+from operator import add
+
+from .. import EnergySample
+from . import EnergyHandler
+
+
+class PrintHandler(EnergyHandler):
+
+    def process(self, sample: EnergySample):
+        """
+        Print the given sample on the standard output
+        """
+        begin_string = f'begin timestamp : {sample.timestamp}; tag : {sample.tag}; duration : {sample.duration}'
+        energy_strings = [f'; {domain} : {value}' for domain, value in sample.energy.items()]
+
+        print(reduce(add, energy_strings, begin_string))
