@@ -18,5 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_recorder import EnergyRecorder
-from .csv_handler import CSVHandler
+from . import EnergyRecorder
+
+
+class CSVHandler(EnergyRecorder):
+
+    def __init__(self, filename):
+        EnergyRecorder.__init__(self)
+
+    def process(self, sample):
+        """
+        Add the trace to the buffer
+        """
+
+    def save_data(self):
+        """
+        Save each trace contained in the buffer and empty the buffer
+        """
+        raise NotImplementedError()
