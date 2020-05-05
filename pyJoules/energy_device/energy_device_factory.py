@@ -26,6 +26,7 @@ from .rapl_device import RaplDevice
 try :
     from .nvidia_device import NvidiaGPUDevice
 except ImportError: 
+    NvidiaGPUDevice=None
     logging.warning(f'pynvml not found you can\'t use NVIDIA devices') 
 
 from ..exception import NoSuchEnergyDeviceError
@@ -37,7 +38,9 @@ class EnergyDeviceFactory:
 
     @staticmethod
     def _gen_all_available_domains() -> List[EnergyDevice]:
-        available_api = [RaplDevice, NvidiaGPUDevice]
+        available_api = [RaplDevice]
+        if NvidiaGPUDevice is not None : 
+            available_api.append(NvidiaGPUDevice)
         available_domains = []
         for api in available_api:
             try:
