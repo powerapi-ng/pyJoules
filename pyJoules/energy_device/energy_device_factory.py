@@ -19,10 +19,15 @@
 # SOFTWARE.
 
 from typing import List, Optional
+import logging
 from operator import add
 from . import EnergyDomain, EnergyDevice
 from .rapl_device import RaplDevice
-from .nvidia_device import NvidiaGPUDevice
+try :
+    from .nvidia_device import NvidiaGPUDevice
+except ImportError: 
+    logging.warning(f'pynvml not found you can\'t use NVIDIA devices') 
+
 from ..exception import NoSuchEnergyDeviceError
 
 from functools import reduce

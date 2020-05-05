@@ -20,10 +20,10 @@
 
 from typing import List
 
-import pynvml
+
 from . import EnergyDevice, EnergyDomain
 from ..exception import PyJoulesException, NoSuchEnergyDeviceError
-
+import pynvml
 
 class NvidiaGPUDomain(EnergyDomain):
 

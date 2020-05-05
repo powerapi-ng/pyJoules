@@ -235,7 +235,7 @@ class EnergyState:
         self.next_state = state
 
 
-def measureit(handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None):
+def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
     :param handler: handler instance that will receive the power consummation data
@@ -256,7 +256,11 @@ def measureit(handler: EnergyHandler = PrintHandler(), domains: Optional[List[En
             return val
         return wrapper_measure
 
-    return decorator_measure_energy
+    if func is None:
+        # to ensure the working system when you call it with parameters or without parameters
+        return decorator_measure_energy
+    else:
+        return decorator_measure_energy(func)
 
 
 class EnergyContext():
