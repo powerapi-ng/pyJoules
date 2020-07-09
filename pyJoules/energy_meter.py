@@ -77,7 +77,7 @@ class EnergyMeter:
         self._first_state = None
 
     def _measure_new_state(self, tag):
-        timestamp = time.perf_counter()
+        timestamp = time.time_ns()
         values = [device.get_energy() for device in self.devices]
 
         return EnergyState(timestamp, tag if tag is not None else self.default_tag, values)

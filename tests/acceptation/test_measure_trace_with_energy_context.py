@@ -36,8 +36,8 @@ from ..utils.sample import assert_sample_are_equals
 TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
 
 @patch('pyJoules.energy_handler.EnergyHandler')
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket, one_gpu_api):
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
 
     domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
 
@@ -57,8 +57,8 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_perf_counter, f
         assert_sample_are_equals(correct_sample, measured_sample)  # test
 
 @patch('pyJoules.energy_handler.EnergyHandler')
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_default_values(mocked_handler, _mocked_perf_counter, fs_pkg_dram_one_socket, one_gpu_api):
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+def test_measure_rapl_device_default_values(mocked_handler, _mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
 
     correct_trace = CorrectTrace([RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)],
                                  [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test

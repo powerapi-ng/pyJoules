@@ -184,7 +184,7 @@ def sample3():
     return EnergySample(ts, tag, duration, energy)
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_iter_on_one_sample_trace_should_return_correct_values(_mocked_fun, energy_meter, sample1):
     energy_meter.start()
     energy_meter.stop()
@@ -194,7 +194,7 @@ def test_iter_on_one_sample_trace_should_return_correct_values(_mocked_fun, ener
         assert_sample_are_equals(sample, sample1)
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_iter_on_two_sample_trace_should_return_two_sample(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.record()
@@ -207,7 +207,7 @@ def test_iter_on_two_sample_trace_should_return_two_sample(_mocked_fun, energy_m
     assert len(samples) == 2
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_iter_on_two_sample_trace_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2):
     energy_meter.start()
     energy_meter.record()
@@ -217,14 +217,14 @@ def test_iter_on_two_sample_trace_should_return_correct_values(_mocked_fun, ener
         assert_sample_are_equals(sample, correct_sample)
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_get_sample_on_a_one_sample_trace_return_correct_values(_mocked_fun, energy_meter, sample1):
     energy_meter.start()
     energy_meter.stop()
     assert_sample_are_equals(energy_meter.get_sample(''), sample1)
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_get_sample_on_a_two_sample_trace_with_same_names_return_first_sample(_mocked_fun, energy_meter, sample1):
     energy_meter.start()
     energy_meter.record()
@@ -233,7 +233,7 @@ def test_get_sample_on_a_two_sample_trace_with_same_names_return_first_sample(_m
     assert_sample_are_equals(energy_meter.get_sample(''), sample1)
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_get_sample_by_their_names_return_correct_samples(_mocked_fun, energy_meter, sample1, sample2):
     energy_meter.start('sample1')
     energy_meter.record('sample2')
@@ -254,7 +254,7 @@ def test_get_sample_that_does_not_exist_raise_SampleNotFoundError(energy_meter):
         energy_meter.get_sample('sample1')
 
 
-@patch('time.perf_counter', side_effect=TIMESTAMP_TRACE)
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_second_start_on_an_energy_meter_should_restart_the_trace(_mocked_fun, energy_meter, sample3):
     energy_meter.start()
     energy_meter.record()
