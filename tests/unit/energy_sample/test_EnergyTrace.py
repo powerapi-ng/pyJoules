@@ -55,6 +55,10 @@ def semi_negative_trace():
 ##########
 # LENGTH #
 ##########
+def test_length_of_zero_element_trace_is_zero():
+    assert len(EnergyTrace([])) == 0
+    
+
 def test_length_of_one_element_trace_is_one(trace_with_one_sample):
     assert len(trace_with_one_sample)
 
@@ -66,7 +70,6 @@ def test_length_of_two_elements_trace_is_two(trace_with_two_sample):
 ##################
 # LIST INTERFACE #
 ##################
-
 def test_create_trace_with_one_sample_and_get_second_element_must_raise_IndexError(trace_with_one_sample):
     with pytest.raises(IndexError):
         trace_with_one_sample[1]
@@ -99,8 +102,25 @@ def test_create_trace_with_one_sample_and_get_tag_of_the_first_element_must_retu
     assert trace_with_one_sample['tag1'] == SAMPLE_1
 
 
-def test_create_trace_with_one_sample_and_get_tag_of_the_second_element_must_return_second_element(trace_with_two_sample):
+def test_create_trace_with_two_sample_and_get_tag_of_the_second_element_must_return_second_element(trace_with_two_sample):
     assert trace_with_two_sample['tag2'] == SAMPLE_2
+
+
+def test_create_trace_with_one_sample_and_use_in_keyword_to_check_if_tag_is_present_return_true(trace_with_one_sample):
+    assert 'tag1' in trace_with_one_sample
+
+
+def test_create_trace_with_one_sample_and_use_in_keyword_to_check_if_bad_tag_is_present_return_false(trace_with_one_sample):
+    assert not 'bad_tag' in trace_with_one_sample
+
+
+def test_get_sample_on_a_two_sample_trace_with_same_names_return_first_sample():
+    s1 = EnergySample('123', 'tag1', 10, {'domain1': 1, 'domain2': 2})
+    s2 = EnergySample('456', 'tag1', 20, {'domain2': 2, 'domain3': 3})
+
+    trace = EnergyTrace([s1, s2])
+
+    assert trace['tag1'] == s1
 
 
 ###########

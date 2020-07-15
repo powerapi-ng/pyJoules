@@ -86,6 +86,9 @@ class EnergyTrace:
         """
         return len(self._samples)
 
+    def __contains__(self, key):
+        return not self._get_sample_from_tag(key) is None
+
     def remove_idle(self, idle: List[Dict[str, float]]):
         """
         substract idle energy values from the current trace
