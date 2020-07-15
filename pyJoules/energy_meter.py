@@ -29,7 +29,7 @@ from typing import List, Optional
 from .exception import PyJoulesException
 from .energy_device import EnergyDevice, EnergyDomain, EnergyDeviceFactory
 from .energy_handler import EnergyHandler, PrintHandler
-from . import EnergySample
+from .energy_sample import EnergySample, EnergyTrace
 
 class NoNextStateException(PyJoulesException):
     """Exception raised when trying to compute duration or energy from a state
@@ -82,6 +82,16 @@ class EnergyMeter:
 
         return EnergyState(timestamp, tag if tag is not None else self.default_tag, values)
 
+    def _append_new_state(self, new_state):
+        self._last_state.add_next_state(new_state)
+        self._last_state = new_state
+
+    def _is_meter_started(self):
+        return self._first_state is None
+
+    def _is_meter_stoped(self):
+        return not self._last_state.tag == '__stop__'
+
     def start(self, tag: Optional[str] = None):
         """
         Begin a new energy trace
@@ -97,43 +107,50 @@ class EnergyMeter:
         :param tag: sample name
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
-        if self._first_state is None:
+        if self._is_meter_started():
             raise EnergyMeterNotStartedError()
 
         new_state = self._measure_new_state(tag)
-        self._last_state.add_next_state(new_state)
-        self._last_state = new_state
+        self._append_new_state(new_state)
+
+    def resume(self, tag: Optional[str] = None):
+        """
+        resume the energy Trace
+        :param tag: sample name
+        :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
+        """
+        if self._is_meter_started():
+            raise EnergyMeterNotStartedError()
+
+        if self._is_meter_stoped():
+            raise EnergyMeterNotStoppedError()
+
+        new_state = self._measure_new_state(tag)
+        self._append_new_state(new_state)
 
     def stop(self):
         """
         Set the end of the energy trace
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
-        if self._first_state is None:
+        if self._is_meter_started():
             raise EnergyMeterNotStartedError()
 
         new_state = self._measure_new_state('__stop__')
-        self._last_state.add_next_state(new_state)
-        self._last_state = new_state
+        self._append_new_state(new_state)
 
-    def get_sample(self, tag: str) -> EnergySample:
+    def get_trace(self):
         """
-        Retrieve the first sample in the trace with the given tag
-        :param tag: tag of the sample to get
-        :return: the sample with the given tag, if many sample have the same tag, the first sample created is returned
+        return the current trace
         :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
-        :raise SampleNotFoundError: if the trace doesn't contains a sample with the given tag name
         """
-        if self._first_state is None:
+        if self._is_meter_started():
             raise EnergyMeterNotStartedError()
 
-        if not self._last_state.tag == '__stop__':
+        if self._is_meter_stoped():
             raise EnergyMeterNotStoppedError()
 
-        for sample in self:
-            if sample.tag == tag:
-                return sample
-        raise SampleNotFoundError()
+        return self._generate_trace()
 
     def _get_domain_list(self):
         """
@@ -141,35 +158,34 @@ class EnergyMeter:
         """
         return reduce(operator.add, [device.get_configured_domains() for device in self.devices])
 
-    def __iter__(self):
-        """
-        iterate on the energy sample of the last trace
-        :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
-        """
-        if self._first_state is None:
-            raise EnergyMeterNotStartedError()
-
-        if not self._last_state.tag == '__stop__':
-            raise EnergyMeterNotStoppedError()
+    def _generate_trace(self):
         domains = self._get_domain_list()
-        return SampleIterator(self._first_state, domains)
+        generator = TraceGenerator(self._first_state, domains)
+        return generator.generate()
 
-class SampleIterator:
+
+class TraceGenerator:
 
     def __init__(self, first_state, domains):
         self.domains = domains
         self._current_state = first_state
 
+    def generate(self):
+        def generate_next(current_state, samples):
+            if current_state.next_state is None:
+                return samples
+            if current_state.tag == '__stop__':
+                return generate_next(current_state.next_state, samples)
+
+            sample = self._gen_sample(current_state)
+            samples.append(sample)
+            return generate_next(current_state.next_state, samples)
+
+        samples = generate_next(self._current_state, [])
+        return EnergyTrace(samples)
+
     def _gen_sample(self, state):
         return EnergySample(state.timestamp, state.tag, state.compute_duration(), state.compute_energy(self.domains))
-
-    def __next__(self):
-        if self._current_state.next_state is None:
-            raise StopIteration()
-
-        sample = self._gen_sample(self._current_state)
-        self._current_state = self._current_state.next_state
-        return sample
 
 
 class EnergyState:
@@ -251,7 +267,7 @@ def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optio
             energy_meter.start(tag=func.__name__)
             val = func(*args, **kwargs)
             energy_meter.stop()
-            for sample in energy_meter:
+            for sample in energy_meter.get_trace():
                 handler.process(sample)
             return val
         return wrapper_measure
@@ -278,5 +294,5 @@ class EnergyContext():
 
     def __exit__(self, type, value, traceback):
         self.energy_meter.stop()
-        for sample in self.energy_meter:
+        for sample in self.energy_meter.get_trace():
             self.handler.process(sample)

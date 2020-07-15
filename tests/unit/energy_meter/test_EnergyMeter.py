@@ -107,50 +107,25 @@ def test_record_on_non_started_energy_meter_raise_EnergyMeterNotStartedError(ene
         energy_meter.record()
 
 
+def test_resume_on_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
+    with pytest.raises(EnergyMeterNotStartedError):
+        energy_meter.record()
+
+
 def test_stop_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
     with pytest.raises(EnergyMeterNotStartedError):
         energy_meter.stop()
 
 
-def test_iter_on_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
-    with pytest.raises(EnergyMeterNotStartedError):
-        energy_meter.__iter__()
-
-
-def test_get_sample_on_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
-    with pytest.raises(EnergyMeterNotStartedError):
-        energy_meter.get_sample('toto')
-
-
-############################
-# NON STOPPED ERRORS TESTS #
-############################
-def test_iter_on_a_non_stopped_energy_meter_raise_EnergyMeterNotStoppedError(energy_meter):
-    energy_meter.start()
+def test_resume_a_non_stoped_energy_meter_raise_EnergyMeterNotStoppedError(energy_meter):
     with pytest.raises(EnergyMeterNotStoppedError):
-        energy_meter.__iter__()
-
-
-def test_get_sample_on_a_non_stopped_energy_meter_raise_EnergyMeterNotStopdError(energy_meter):
-    energy_meter.start()
-    with pytest.raises(EnergyMeterNotStoppedError):
-        energy_meter.get_sample('toto')
+        energy_meter.start()
+        energy_meter.resume()
 
 
 ####################
-# GET ENERGY TRACE #
+# TRACE GENERATION #
 ####################
-def test_iter_on_one_sample_trace_should_return_one_sample(energy_meter):
-    energy_meter.start()
-    energy_meter.stop()
-    samples = []
-
-    for sample in energy_meter:
-        samples.append(sample)
-
-    assert len(samples) == 1
-
-
 @pytest.fixture
 def sample1():
     ts = TIMESTAMP_TRACE[0]
@@ -174,6 +149,17 @@ def sample2():
 
 
 @pytest.fixture
+def sample2_5():
+    ts = TIMESTAMP_TRACE[2]
+    tag = ''
+    duration = TIMESTAMP_TRACE[3] - TIMESTAMP_TRACE[2]
+    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[3][0] - DEVICE1_ENERGY_TRACE[2][0],
+              str(EnergyDomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[3][1] - DEVICE1_ENERGY_TRACE[2][1],
+              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[3][0] - DEVICE2_ENERGY_TRACE[2][0]}
+    return EnergySample(ts, tag, duration, energy)
+
+
+@pytest.fixture
 def sample3():
     ts = TIMESTAMP_TRACE[3]
     tag = ''
@@ -184,74 +170,111 @@ def sample3():
     return EnergySample(ts, tag, duration, energy)
 
 
+def test_get_trace_on_a_non_stopped_energy_meter_raise_EnergyMeterNotStoppedError(energy_meter):
+    energy_meter.start()
+    with pytest.raises(EnergyMeterNotStoppedError):
+        energy_meter.get_trace()
+
+
+def test_get_trace__on_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
+    with pytest.raises(EnergyMeterNotStartedError):
+        energy_meter.get_trace()
+
+
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_iter_on_one_sample_trace_should_return_correct_values(_mocked_fun, energy_meter, sample1):
+def test_start_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.stop()
-    samples = []
 
-    for sample in energy_meter:
+    samples = []
+    for sample in energy_meter.get_trace():
+        samples.append(sample)
+
+    assert len(samples) == 1
+
+
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+def test_start_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1):
+    energy_meter.start()
+    energy_meter.stop()
+
+    for sample in energy_meter.get_trace():
         assert_sample_are_equals(sample, sample1)
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_iter_on_two_sample_trace_should_return_two_sample(_mocked_fun, energy_meter):
+def test_start_record_and_stop_EnergyMeter_should_return_two_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.record()
     energy_meter.stop()
 
     samples = []
-    for sample in energy_meter:
+    for sample in energy_meter.get_trace():
         samples.append(sample)
 
     assert len(samples) == 2
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_iter_on_two_sample_trace_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2):
+def test_start_record_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2):
     energy_meter.start()
     energy_meter.record()
     energy_meter.stop()
 
-    for sample, correct_sample in zip(energy_meter, [sample1, sample2]):
+    for sample, correct_sample in zip(energy_meter.get_trace(), [sample1, sample2]):
         assert_sample_are_equals(sample, correct_sample)
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_get_sample_on_a_one_sample_trace_return_correct_values(_mocked_fun, energy_meter, sample1):
+def test_start_stop_resume_stop_EnergyMeter_should_return_two_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.stop()
-    assert_sample_are_equals(energy_meter.get_sample(''), sample1)
+    energy_meter.resume()
+    energy_meter.stop()
+
+    samples = []
+    for sample in energy_meter.get_trace():
+        samples.append(sample)
+
+    assert len(samples) == 2
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_get_sample_on_a_two_sample_trace_with_same_names_return_first_sample(_mocked_fun, energy_meter, sample1):
+def test_start_stop_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2_5):
+    energy_meter.start()
+    energy_meter.stop()
+    energy_meter.resume()
+    energy_meter.stop()
+
+    for sample, correct_sample in zip(energy_meter.get_trace(), [sample1, sample2_5]):
+        assert_sample_are_equals(sample, correct_sample)
+
+
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+def test_start_record_stop_resume_stop_EnergyMeter_should_return_three_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.record()
     energy_meter.stop()
+    energy_meter.resume()
+    energy_meter.stop()
 
-    assert_sample_are_equals(energy_meter.get_sample(''), sample1)
+    samples = []
+    for sample in energy_meter.get_trace():
+        samples.append(sample)
+
+    assert len(samples) == 3
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_get_sample_by_their_names_return_correct_samples(_mocked_fun, energy_meter, sample1, sample2):
-    energy_meter.start('sample1')
-    energy_meter.record('sample2')
-    energy_meter.stop()
-
-    sample1.tag = 'sample1'
-    sample2.tag = 'sample2'
-
-    assert_sample_are_equals(energy_meter.get_sample('sample1'), sample1)
-    assert_sample_are_equals(energy_meter.get_sample('sample2'), sample2)
-
-
-def test_get_sample_that_does_not_exist_raise_SampleNotFoundError(energy_meter):
+def test_start_record_stop_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2, sample3):
     energy_meter.start()
+    energy_meter.record()
+    energy_meter.stop()
+    energy_meter.resume()
     energy_meter.stop()
 
-    with pytest.raises(SampleNotFoundError):
-        energy_meter.get_sample('sample1')
+    for sample, correct_sample in zip(energy_meter.get_trace(), [sample1, sample2, sample3]):
+        assert_sample_are_equals(sample, correct_sample)
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
@@ -263,7 +286,7 @@ def test_second_start_on_an_energy_meter_should_restart_the_trace(_mocked_fun, e
     energy_meter.stop()
 
     samples = []
-    for sample in energy_meter:
+    for sample in energy_meter.get_trace():
         samples.append(sample)
 
     assert len(samples) == 1
@@ -284,5 +307,12 @@ def test_define_energy_meter_with_default_tag_create_sample_with_default_tag():
     meter.start()
     meter.stop()
 
-    sample = meter.get_sample('tag')
+    trace = meter.get_trace()
+
+    sample = trace['tag']
     assert sample.tag == 'tag'
+
+
+############
+# GEN_IDLE #
+############

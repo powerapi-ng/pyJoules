@@ -60,5 +60,5 @@ def test_measure_rapl_device_all_domains(_mocked_time_ns, fs_pkg_dram_one_socket
     correct_trace.add_new_sample('')  # test
     meter.stop()
 
-    for sample1, sample2 in zip(correct_trace, meter):  # test
+    for sample1, sample2 in zip(correct_trace, meter.get_trace()):  # test
         assert_sample_are_equals(sample1, sample2)  # test
