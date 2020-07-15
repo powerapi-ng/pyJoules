@@ -24,7 +24,7 @@ import operator
 import functools
 
 from functools import reduce
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from .exception import PyJoulesException
 from .energy_device import EnergyDevice, EnergyDomain, EnergyDeviceFactory
@@ -87,10 +87,10 @@ class EnergyMeter:
         self._last_state = new_state
 
     def _is_meter_started(self):
-        return self._first_state is None
+        return not self._first_state is None
 
     def _is_meter_stoped(self):
-        return not self._last_state.tag == '__stop__'
+        return self._last_state.tag == '__stop__'
 
     def start(self, tag: Optional[str] = None):
         """
@@ -107,7 +107,7 @@ class EnergyMeter:
         :param tag: sample name
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
-        if self._is_meter_started():
+        if not self._is_meter_started():
             raise EnergyMeterNotStartedError()
 
         new_state = self._measure_new_state(tag)
@@ -115,14 +115,14 @@ class EnergyMeter:
 
     def resume(self, tag: Optional[str] = None):
         """
-        resume the energy Trace
+        resume the energy Trace (if no energy trace was launched, start a new one
         :param tag: sample name
         :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
         """
-        if self._is_meter_started():
-            raise EnergyMeterNotStartedError()
-
-        if self._is_meter_stoped():
+        if not self._is_meter_started():
+            return self.start(tag)
+        
+        if not self._is_meter_stoped():
             raise EnergyMeterNotStoppedError()
 
         new_state = self._measure_new_state(tag)
@@ -133,7 +133,7 @@ class EnergyMeter:
         Set the end of the energy trace
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
-        if self._is_meter_started():
+        if not self._is_meter_started():
             raise EnergyMeterNotStartedError()
 
         new_state = self._measure_new_state('__stop__')
@@ -144,10 +144,10 @@ class EnergyMeter:
         return the current trace
         :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
         """
-        if self._is_meter_started():
-            raise EnergyMeterNotStartedError()
+        if not self._is_meter_started():
+            return EnergyTrace([])
 
-        if self._is_meter_stoped():
+        if not self._is_meter_stoped():
             raise EnergyMeterNotStoppedError()
 
         return self._generate_trace()
@@ -162,6 +162,24 @@ class EnergyMeter:
         domains = self._get_domain_list()
         generator = TraceGenerator(self._first_state, domains)
         return generator.generate()
+
+    def gen_idle(self, trace: EnergyTrace) -> List[float]:
+        """
+        generate idle values of an energy trace
+        for each sample, wait for the duraction of a sample and measure the energy consumed during this period
+        :return: the list of idle energy consumption for each sample in the trace
+        """
+        idle_values = []
+
+        for sample in trace:
+            self.resume()
+            time.sleep(sample.duration / 1000000000)
+            self.stop()
+
+        for sample in self.get_trace():
+            idle_values.append(sample.energy)
+
+        return idle_values
 
 
 class TraceGenerator:
@@ -193,7 +211,7 @@ class EnergyState:
     Internal class that record the current energy state of the monitored device
     """
 
-    def __init__(self, timestamp: float, tag: str, values: List[float]):
+    def __init__(self, timestamp: float, tag: str, values: List[Dict[str, float]]):
         """
         :param timstamp: timestamp of the measure
         :param tag: tag of the measure

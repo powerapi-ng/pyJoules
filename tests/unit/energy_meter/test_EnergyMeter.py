@@ -24,6 +24,7 @@ from mock import patch
 from pyJoules.energy_meter import EnergyMeter, EnergySample
 from pyJoules.energy_meter import EnergyMeterNotStartedError, EnergyMeterNotStoppedError, SampleNotFoundError
 from pyJoules.energy_device import EnergyDevice, EnergyDomain
+from pyJoules.energy_sample import EnergyTrace
 from ...utils.sample import assert_sample_are_equals
 
 DEVICE1_ENERGY_TRACE = [[1.0, 1.1],
@@ -38,7 +39,7 @@ DEVICE2_ENERGY_TRACE = [[4.0],
                         [10.3],
                         [11.123]]
 
-TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
+TIMESTAMP_TRACE = [1.1, 3.2, 3.3, 4.4, 5.5]
 
 
 class EnergyDomainDevice1Domain1(EnergyDomain):
@@ -107,11 +108,6 @@ def test_record_on_non_started_energy_meter_raise_EnergyMeterNotStartedError(ene
         energy_meter.record()
 
 
-def test_resume_on_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
-    with pytest.raises(EnergyMeterNotStartedError):
-        energy_meter.record()
-
-
 def test_stop_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
     with pytest.raises(EnergyMeterNotStartedError):
         energy_meter.stop()
@@ -176,9 +172,8 @@ def test_get_trace_on_a_non_stopped_energy_meter_raise_EnergyMeterNotStoppedErro
         energy_meter.get_trace()
 
 
-def test_get_trace__on_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy_meter):
-    with pytest.raises(EnergyMeterNotStartedError):
-        energy_meter.get_trace()
+def test_get_trace_on_a_non_started_energy_meter_return_empty_trace(energy_meter):
+        assert len(energy_meter.get_trace()) == 0
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
@@ -186,11 +181,7 @@ def test_start_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun, 
     energy_meter.start()
     energy_meter.stop()
 
-    samples = []
-    for sample in energy_meter.get_trace():
-        samples.append(sample)
-
-    assert len(samples) == 1
+    assert len(energy_meter.get_trace()) == 1
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
@@ -203,16 +194,29 @@ def test_start_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, en
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+def test_resume_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun, energy_meter):
+    energy_meter.resume()
+    energy_meter.stop()
+
+    assert len(energy_meter.get_trace()) == 1
+
+
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+def test_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1):
+    energy_meter.resume()
+    energy_meter.stop()
+
+    for sample in energy_meter.get_trace():
+        assert_sample_are_equals(sample, sample1)
+
+
+@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
 def test_start_record_and_stop_EnergyMeter_should_return_two_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.record()
     energy_meter.stop()
 
-    samples = []
-    for sample in energy_meter.get_trace():
-        samples.append(sample)
-
-    assert len(samples) == 2
+    assert len(energy_meter.get_trace())
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
@@ -232,11 +236,7 @@ def test_start_stop_resume_stop_EnergyMeter_should_return_two_sample_trace(_mock
     energy_meter.resume()
     energy_meter.stop()
 
-    samples = []
-    for sample in energy_meter.get_trace():
-        samples.append(sample)
-
-    assert len(samples) == 2
+    assert len(energy_meter.get_trace()) == 2
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
@@ -258,11 +258,7 @@ def test_start_record_stop_resume_stop_EnergyMeter_should_return_three_sample_tr
     energy_meter.resume()
     energy_meter.stop()
 
-    samples = []
-    for sample in energy_meter.get_trace():
-        samples.append(sample)
-
-    assert len(samples) == 3
+    assert len(energy_meter.get_trace()) == 3
 
 
 @patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
@@ -316,3 +312,40 @@ def test_define_energy_meter_with_default_tag_create_sample_with_default_tag():
 ############
 # GEN_IDLE #
 ############
+def test_gen_idle_on_empty_trace_return_empty_list(energy_meter):
+    trace = EnergyTrace([])
+    assert energy_meter.gen_idle(trace) == []
+
+
+def test_gen_idle_on_one_sample_trace_must_return_list_with_one_value(energy_meter, sample1):
+    trace = EnergyTrace([sample1])
+    assert len(energy_meter.gen_idle(trace)) == 1
+
+
+def test_gen_idle_on_one_sample_trace_must_return_list_with_two_value(energy_meter, sample1, sample2):
+    trace = EnergyTrace([sample1, sample2])
+    assert len(energy_meter.gen_idle(trace)) == 2
+
+
+@patch('time.sleep', side_effect=TIMESTAMP_TRACE)
+def test_gen_idle_on_one_sample_trace_must_wait_same_duration_of_sample_in_second(mocked_time, energy_meter, sample1):
+    trace = EnergyTrace([sample1])
+    energy_meter.gen_idle(trace)
+    assert mocked_time.call_args[0][0] == sample1.duration / 1000000000
+
+
+@patch('time.sleep', side_effect=TIMESTAMP_TRACE)
+def test_gen_idle_on_two_sample_trace_must_wait_same_duration_of_samples_in_second(mocked_time, energy_meter, sample1, sample2):
+    trace = EnergyTrace([sample1, sample2])
+    energy_meter.gen_idle(trace)
+    assert mocked_time.call_args_list[0][0][0] == pytest.approx(sample1.duration / 1000000000)
+    assert mocked_time.call_args_list[1][0][0] == pytest.approx(sample2.duration / 1000000000)
+
+
+@patch('time.sleep', side_effect=TIMESTAMP_TRACE)
+def test_gen_idle_on_one_sample_trace_must_return_idle_value(mocked_time, energy_meter, sample1, sample3):
+    trace = EnergyTrace([sample1])
+    idle = energy_meter.gen_idle(trace)
+
+    # sample1 is the sample measured during idle period
+    assert idle[0] == sample1.energy
