@@ -23,9 +23,15 @@ This technology is available on Intel CPU since the [Sandy Bridge generation](ht
 **pyJoules** uses the nvidia "_Nvidia Management Library_" technology to measure energy consumption of nvidia devices. The energy measurement API is only available on nvidia GPU with [Volta architecture](https://en.wikipedia.org/wiki/Volta_(microarchitecture))(2018)
 # Installation
 
+## Requirements
+
+- python >= 3.7
+- [nvml](https://developer.nvidia.com/nvidia-management-library-nvml) (if you want nvidia GPU support)
+
+## Installation
 You can install **pyJoules** with pip: `pip install pyJoules`
 
-if you want to use pyJoule to also measure nvidia GPU energy consumption, you have to install it with nvidia driver support using this command : `pip install pyJoules[nvidia]`. You need also to install the [nvml](https://developer.nvidia.com/nvidia-management-library-nvml) library.
+if you want to use pyJoule to also measure nvidia GPU energy consumption, you have to install it with nvidia driver support using this command : `pip install pyJoules[nvidia]`.
 
 # Basic usage
 
