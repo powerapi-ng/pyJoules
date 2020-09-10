@@ -23,6 +23,9 @@ This technology is available on Intel CPU since the [Sandy Bridge generation](ht
 **pyJoules** uses the nvidia "_Nvidia Management Library_" technology to measure energy consumption of nvidia devices. The energy measurement API is only available on nvidia GPU with [Volta architecture](https://en.wikipedia.org/wiki/Volta_(microarchitecture))(2018)
 # Installation
 
+### Measurement frequency
+PyJoule use hardware measurement tools (intel RAPL, nvidia GPU tools, ...) to measure device energy consumption. Theses tools have a mesasurement frequency that depend of the device. Thus, you can't use Pyjoule to measure energy consumption during a period shorter than the device energy measurement frequency. Pyjoule will return null values if the measurement period is to short.
+
 ## Requirements
 
 - python >= 3.7
@@ -51,7 +54,20 @@ def foo():
 foo()
 ```
 
-This will print in the console the recorded energy consumption of all the monitorable devices during the execution of function `foo`.
+This will print on the console the recorded energy consumption of all the monitorable devices during the execution of function `foo`.
+
+### Output description
+decorator basic usage will print iformation with this format : 
+
+`begin timestamp : XXX; tag : YYY; duration : ZZZ;device_name: AAAA`
+
+with : 
+- `begin timestamp` : monitored function launching time
+- `tag`: tag of the measure, if nothing is specified, this will be the function name
+- `duration`: function execution duration
+- `device_name`: power consumption of the device `device_name` in uJ
+
+for cpu and ram devices, device_name match the RAPL domain described on the image below plus the CPU socket id. Rapl domain are described [here]()
 
 ## Configure the decorator specifying the device to monitor
 
@@ -77,6 +93,8 @@ You can append the following domain list to monitor them :
 - `pyJoules.energy_device.rapl_device.RaplUncoreDomain` : integrated GPU (specify the socket id in parameter)
 - `pyJoules.energy_device.rapl_device.RaplCoreDomain` : RAPL Core domain (specify the socket id in parameter)
 - `pyJoules.energy_device.nvidia_device.NvidiaGPUDomain` : Nvidia GPU (specify the socket id in parameter)
+
+to understand which par of the cpu each RAPL domain monitor, see this [section]()
 
 ## Configure the output of the decorator
 
@@ -140,6 +158,16 @@ This will record the energy consumed :
 - between the call of the `ctx.record` method and the end of the `EnergyContext`
 
 Each measured part will be written in the csv file. One line per part.
+
+# RAPL domain description
+
+RAPL domains match part of the cpu socket as described in this image : 
+
+![](https://raw.githubusercontent.com/powerapi-ng/pyJoules/master/rapl_domains.png)
+
+- Package : correspond to the wall cpu energy consumption
+- core : correpond to the sum of all cpu core energy consumption
+- uncore : correspond to the integrated GPU
 
 # Miscellaneous
 
