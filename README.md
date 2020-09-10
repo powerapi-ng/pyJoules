@@ -67,7 +67,7 @@ with :
 - `duration`: function execution duration
 - `device_name`: power consumption of the device `device_name` in uJ
 
-for cpu and ram devices, device_name match the RAPL domain described on the image below plus the CPU socket id. Rapl domain are described [here]()
+for cpu and ram devices, device_name match the RAPL domain described on the image below plus the CPU socket id. Rapl domain are described [here](https://github.com/powerapi-ng/pyJoules/blob/master/README.md#rapl-domain-description)
 
 ## Configure the decorator specifying the device to monitor
 
@@ -94,7 +94,7 @@ You can append the following domain list to monitor them :
 - `pyJoules.energy_device.rapl_device.RaplCoreDomain` : RAPL Core domain (specify the socket id in parameter)
 - `pyJoules.energy_device.nvidia_device.NvidiaGPUDomain` : Nvidia GPU (specify the socket id in parameter)
 
-to understand which par of the cpu each RAPL domain monitor, see this [section]()
+to understand which par of the cpu each RAPL domain monitor, see this [section](https://github.com/powerapi-ng/pyJoules/blob/master/README.md#rapl-domain-description)
 
 ## Configure the output of the decorator
 
