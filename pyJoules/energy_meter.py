@@ -167,7 +167,7 @@ class EnergyMeter:
         generator = TraceGenerator(self._first_state, domains)
         return generator.generate()
 
-    def gen_idle(self, trace: EnergyTrace) -> List[float]:
+    def gen_idle(self, trace: EnergyTrace) -> List[Dict[str, float]]:
         """
         generate idle values of an energy trace
         for each sample, wait for the duraction of a sample and measure the energy consumed during this period
