@@ -93,7 +93,7 @@ class RaplDevice(EnergyDevice):
         :raise NoSuchEnergyDeviceError: if no RAPL API is available on this machine
         """
         EnergyDevice.__init__(self)
-        self._api_files = None
+        self._api_file_names = None
 
     @staticmethod
     def _rapl_api_available():
@@ -210,15 +210,11 @@ class RaplDevice(EnergyDevice):
     def configure(self, domains=None):
         EnergyDevice.configure(self, domains)
 
-        self._api_files = self._collect_domain_api_file_name(self._configured_domains)
+        self._api_file_names = self._collect_domain_api_file_name(self._configured_domains)
 
     def _read_energy_value(self, api_file):
-        api_file.seek(0, 0)
         return float(api_file.readline())
 
     def get_energy(self):
-        energies = []
-        for api_file in self._api_files:
-            with open(api_file) as openned_api_file:
-                energies.append(self._read_energy_value(openned_api_file))
+        energies = [self._read_energy_value(open(api_file_name, 'r')) for api_file_name in self._api_file_names]
         return energies
