@@ -103,9 +103,9 @@ If you want to handle data with different output than the standard one, you can 
 As an example, if you want to write the recorded energy consumption in a .csv file:
 ```python
 from pyJoules.energy_meter import measureit
-from pyJoules.energy_handler import CsvHandler
+from pyJoules.energy_handler.energy_recorder import CsvHandler
 	
-csv_handler = CsvHandler('result.csv')
+csv_handler = CSVHandler('result.csv')
 	
 @measureit(handler=csv_handler)
 def foo():
@@ -114,7 +114,7 @@ def foo():
 for _ in range(100):
 	foo()
 		
-csv_output.save()
+csv_handler.save_data()
 ```
 
 This will produce a csv file of 100 lines. Each line containing the energy
@@ -140,16 +140,16 @@ and report it in a csv file :
 from pyJoules.energy_meter import EnergyContext
 from pyJoules.energy_device.rapl_device import RaplPackageDomain
 from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
-from pyJoules.energy_handler import CsvHandler
+from pyJoules.energy_handler.energy_recorder import CSVHandler
 	
-csv_handler = CsvHandler('result.csv')
+csv_handler = CSVHandler('result.csv')
 
 with EnergyContext(handler=csv_handler, domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)], start_tag='foo') as ctx:
 	foo()
 	ctx.record(tag='bar')
 	bar()
 
-csv_handler.save()
+csv_handler.save_data()
 ```
 
 This will record the energy consumed :
