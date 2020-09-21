@@ -19,7 +19,11 @@
 # SOFTWARE.
 from typing import Iterable
 
-import pandas
+try:
+    import pandas
+except ImportError:
+    import logging
+    logging.getLogger().info("Pandas is not installed.")
 
 from . import EnergyHandler, UnconsistantSamplesError
 from .. import EnergySample
