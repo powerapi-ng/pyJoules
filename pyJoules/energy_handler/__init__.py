@@ -18,5 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_handler import EnergyHandler
+from .energy_handler import EnergyHandler, UnconsistantSamplesError
+from .pandas_handler import PandasHandler, NoSampleProcessedError
 from .print_handler import PrintHandler

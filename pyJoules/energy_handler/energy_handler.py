@@ -21,6 +21,12 @@
 from .. import EnergySample
 
 
+class UnconsistantSamplesError(Exception):
+    """
+    Exception raised when processed sample whith differents energy domain
+    """
+
+
 class EnergyHandler:
     """
     An object that can handle the measured value of an energy trace
