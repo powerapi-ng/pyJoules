@@ -92,6 +92,10 @@ class EnergyMeter:
     def _is_meter_stoped(self):
         return self._last_state.tag == '__stop__'
 
+    def _reinit(self):
+        self._first_state = None
+        self._last_state = None
+
     def start(self, tag: Optional[str] = None):
         """
         Begin a new energy trace
@@ -169,6 +173,7 @@ class EnergyMeter:
         for each sample, wait for the duraction of a sample and measure the energy consumed during this period
         :return: the list of idle energy consumption for each sample in the trace
         """
+        self._reinit()
         idle_values = []
 
         for sample in trace:

@@ -52,7 +52,6 @@ class EnergyTrace:
 
     def _get_sample_from_tag(self, tag):
         for sample in self._samples:
-            print(sample)
             if sample.tag == tag:
                 return sample
 

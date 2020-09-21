@@ -322,7 +322,7 @@ def test_gen_idle_on_one_sample_trace_must_return_list_with_one_value(energy_met
     assert len(energy_meter.gen_idle(trace)) == 1
 
 
-def test_gen_idle_on_one_sample_trace_must_return_list_with_two_value(energy_meter, sample1, sample2):
+def test_gen_idle_on_two_sample_trace_must_return_list_with_two_value(energy_meter, sample1, sample2):
     trace = EnergyTrace([sample1, sample2])
     assert len(energy_meter.gen_idle(trace)) == 2
 
@@ -349,3 +349,11 @@ def test_gen_idle_on_one_sample_trace_must_return_idle_value(mocked_time, energy
 
     # sample1 is the sample measured during idle period
     assert idle[0] == sample1.energy
+
+@patch('time.sleep', side_effect=TIMESTAMP_TRACE)
+def test_measure_trace_with_one_sample_and_gen_idle_from_this_trace_must_generate_one_idle_value(mocked_time, energy_meter):
+    energy_meter.start()
+    energy_meter.stop()
+
+    trace = energy_meter.get_trace()
+    assert len(energy_meter.gen_idle(trace)) == 1
