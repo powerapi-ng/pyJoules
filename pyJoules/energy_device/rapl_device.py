@@ -93,7 +93,7 @@ class RaplDevice(EnergyDevice):
         :raise NoSuchEnergyDeviceError: if no RAPL API is available on this machine
         """
         EnergyDevice.__init__(self)
-        self._api_files = None
+        self._api_file_names = None
 
     @staticmethod
     def _rapl_api_available():
@@ -132,9 +132,9 @@ class RaplDevice(EnergyDevice):
         for socket_id in RaplDevice._get_socket_id_list():
             domain_name_file_str = RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/name'
             if os.path.exists(domain_name_file_str):
-                domain_name_file = open(domain_name_file_str)
-                if domain_name_file.readline() == 'package-' + str(socket_id) + '\n':
-                    package_domains.append(RaplPackageDomain(socket_id))
+                 with open(domain_name_file_str) as domain_name_file:
+                     if domain_name_file.readline() == 'package-' + str(socket_id) + '\n':
+                         package_domains.append(RaplPackageDomain(socket_id))
         return package_domains
 
     @staticmethod
@@ -144,10 +144,10 @@ class RaplDevice(EnergyDevice):
             domain_name_file_str = (RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/intel-rapl:' + str(socket_id) +
                                     ':' + str(domain_id) + '/name')
             if os.path.exists(domain_name_file_str):
-                domain_name_file = open(domain_name_file_str)
-                if domain_name_file.readline() == domain_name + '\n':
-                    return True
-                domain_id += 1
+                with open(domain_name_file_str) as domain_name_file:
+                    if domain_name_file.readline() == domain_name + '\n':
+                        return True
+                    domain_id += 1
             else:
                 return False
 
@@ -195,30 +195,26 @@ class RaplDevice(EnergyDevice):
             domain_name_file_str = (RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/intel-rapl:' + str(socket_id) +
                                     ':' + str(domain_id) + '/name')
             if os.path.exists(domain_name_file_str):
-                domain_name_file = open(domain_name_file_str)
-                if domain_name_file.readline() == domain.get_domain_name() + '\n':
-                    return (RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/intel-rapl:' + str(socket_id) +
+                with open(domain_name_file_str) as domain_name_file:
+                    if domain_name_file.readline() == domain.get_domain_name() + '\n':
+                        return (RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/intel-rapl:' + str(socket_id) + \
                             ':' + str(domain_id) + '/energy_uj')
-                else:
-                    domain_id += 1
+                    else:
+                        domain_id += 1
             else:
                 raise ValueError()
 
-    def _open_api_files(self, domain_list):
-        api_files = []
-        for domain in domain_list:
-            domain_file_name = self._get_domain_file_name(domain)
-            api_files.append(open(domain_file_name))
-        return api_files
+    def _collect_domain_api_file_name(self, domain_list):
+        return [self._get_domain_file_name(domain) for domain in domain_list]
 
     def configure(self, domains=None):
         EnergyDevice.configure(self, domains)
 
-        self._api_files = self._open_api_files(self._configured_domains)
+        self._api_file_names = self._collect_domain_api_file_name(self._configured_domains)
 
     def _read_energy_value(self, api_file):
-        api_file.seek(0, 0)
         return float(api_file.readline())
 
     def get_energy(self):
-        return [self._read_energy_value(api_file) for api_file in self._api_files]
+        energies = [self._read_energy_value(open(api_file_name, 'r')) for api_file_name in self._api_file_names]
+        return energies
