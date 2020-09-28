@@ -19,7 +19,11 @@
 # SOFTWARE.
 from typing import Dict, Iterable
 
-import pymongo
+try:
+    import pymongo
+except ImportError:
+    import logging
+    logging.getLogger().info("PyMongo is not installed.")
 
 from . import EnergyRecorder
 from ... import EnergySample

@@ -6,6 +6,9 @@ jobs:
       # Language image for build and unit tests
       - image: circleci/python:3.7
 
+      # Service image for integration tests
+      - image: circleci/mongo:4.0
+
     working_directory: ~/repo
 
     steps:
@@ -23,7 +26,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip3 install -e ".[nvidia, pandas]"
+            pip3 install -e ".[nvidia, pandas, mongodb]"
       - save_cache:
           paths:
             - ./venv
