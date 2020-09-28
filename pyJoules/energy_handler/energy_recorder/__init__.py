@@ -20,3 +20,5 @@
 
 from .energy_recorder import EnergyRecorder
 from .csv_handler import CSVHandler
+from .mongo_handler import MongoHandler, MongoInitError, trace_to_dict, sample_to_dict
+
