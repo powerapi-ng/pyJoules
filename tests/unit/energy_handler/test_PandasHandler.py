@@ -21,7 +21,7 @@
 import pytest
 import pandas
 
-from pyJoules.energy_handler import PandasHandler, NoSampleProcessedError, UnconsistantSamplesError
+from pyJoules.energy_handler.pandas_handler import PandasHandler, NoSampleProcessedError, UnconsistantSamplesError
 from pyJoules import EnergySample
 
 

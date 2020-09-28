@@ -22,7 +22,7 @@ import pymongo
 
 
 from pyJoules import EnergySample
-from pyJoules.energy_handler.energy_recorder import MongoHandler, MongoInitError
+from pyJoules.energy_handler.energy_recorder.mongo_handler import MongoHandler, MongoInitError
 
 
 URI = 'mongodb://localhost:27017'

@@ -22,7 +22,7 @@ import pytest
 import pyfakefs
 import os.path
 
-from pyJoules.energy_handler.energy_recorder import CSVHandler
+from pyJoules.energy_handler.energy_recorder.csv_handler import CSVHandler
 from pyJoules import EnergySample
 
 
