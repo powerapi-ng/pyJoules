@@ -34,10 +34,17 @@ from ..utils.fake_api import CorrectTrace
 from ..utils.sample import assert_sample_are_equals
 
 
-TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
+# We mock time.time function that is used by pyfakefs each time an operation on filesystem is done. we have to give
+# consistant time return value to time.time that will be used by pyfakefs
+INIT_TS = [0] * 5
+FIRST_TS = [1.1] * 7
+SECOND_TS = [2.2] * 7
+THIRD_TS = [3.3] * 7
+MOCKED_TIMESTAMP_TRACE = INIT_TS + FIRST_TS + SECOND_TS + THIRD_TS
+TIMESTAMP_TRACE = [1.1, 2.2, 3.3]
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
 def test_measure_rapl_device_all_domains(_mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
     domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
 
@@ -48,7 +55,7 @@ def test_measure_rapl_device_all_domains(_mocked_time_ns, fs_pkg_dram_one_socket
 
     nvidia = NvidiaGPUDevice()
     nvidia.configure(domains=[NvidiaGPUDomain(0)])
-    
+
     meter = EnergyMeter([rapl, nvidia])
 
     correct_trace.add_new_sample('foo')  # test

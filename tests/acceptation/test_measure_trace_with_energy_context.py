@@ -1,4 +1,4 @@
- # MIT License
+# MIT License
 # Copyright (c) 2019, INRIA
 # Copyright (c) 2019, University of Lille
 # All rights reserved.
@@ -33,11 +33,18 @@ from ..utils.fake_nvidia_api import one_gpu_api
 from .. utils.fake_api import CorrectTrace
 from ..utils.sample import assert_sample_are_equals
 
-TIMESTAMP_TRACE = [1.1, 2.2, 3.3, 4.4, 5.5]
+
+# We mock time.time function that is used by pyfakefs each time an operation on filesystem is done. we have to give
+# consistant time return value to time.time that will be used by pyfakefs
+FIRST_TS = [1.1] * 16
+SECOND_TS = [2.2] * 7
+THIRD_TS = [3.3] * 7
+MOCKED_TIMESTAMP_TRACE = FIRST_TS + SECOND_TS + THIRD_TS
+TIMESTAMP_TRACE = [1.1, 2.2, 3.3]
 
 @patch('pyJoules.energy_handler.EnergyHandler')
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
+@patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
+def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
 
     domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
 
@@ -56,18 +63,25 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time_ns, fs_pkg
 
         assert_sample_are_equals(correct_sample, measured_sample)  # test
 
+
 @patch('pyJoules.energy_handler.EnergyHandler')
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
-def test_measure_rapl_device_default_values(mocked_handler, _mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
+@patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
+def test_measure_rapl_device_default_values(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
 
     correct_trace = CorrectTrace([RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)],
                                  [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
+    print('==================')
     correct_trace.add_new_sample('start')  # test
+    print('--------------------')
     with EnergyContext(mocked_handler) as energy_context:
+        print('=====================')
         correct_trace.add_new_sample('second_tag')  # test
+        print('--------------------')
         energy_context.record(tag='second_tag')
+        print('=====================')
         correct_trace.add_new_sample('')  # test
+        print('--------------------')
 
     assert mocked_handler.process.call_count == 2   # test
 

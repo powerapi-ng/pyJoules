@@ -17,8 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from __future__ import annotations
-
 import time
 import operator
 import functools
@@ -77,7 +75,7 @@ class EnergyMeter:
         self._first_state = None
 
     def _measure_new_state(self, tag):
-        timestamp = time.time_ns()
+        timestamp = time.time()
         values = [device.get_energy() for device in self.devices]
 
         return EnergyState(timestamp, tag if tag is not None else self.default_tag, values)
@@ -264,7 +262,7 @@ class EnergyState:
             values_dict[str(key)] = value
         return values_dict
 
-    def add_next_state(self, state: EnergyState):
+    def add_next_state(self, state: 'EnergyState'):
         """
         :param previous: next state for the same energy trace
         :raise StateIsNotFinalError: if there are already a next state

@@ -176,7 +176,7 @@ def test_get_trace_on_a_non_started_energy_meter_return_empty_trace(energy_meter
         assert len(energy_meter.get_trace()) == 0
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.stop()
@@ -184,7 +184,7 @@ def test_start_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun, 
     assert len(energy_meter.get_trace()) == 1
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1):
     energy_meter.start()
     energy_meter.stop()
@@ -193,7 +193,7 @@ def test_start_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, en
         assert_sample_are_equals(sample, sample1)
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_resume_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun, energy_meter):
     energy_meter.resume()
     energy_meter.stop()
@@ -201,7 +201,7 @@ def test_resume_and_stop_EnergyMeter_should_return_one_sample_trace(_mocked_fun,
     assert len(energy_meter.get_trace()) == 1
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1):
     energy_meter.resume()
     energy_meter.stop()
@@ -210,7 +210,7 @@ def test_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, e
         assert_sample_are_equals(sample, sample1)
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_record_and_stop_EnergyMeter_should_return_two_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.record()
@@ -219,7 +219,7 @@ def test_start_record_and_stop_EnergyMeter_should_return_two_sample_trace(_mocke
     assert len(energy_meter.get_trace())
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_record_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2):
     energy_meter.start()
     energy_meter.record()
@@ -229,7 +229,7 @@ def test_start_record_and_stop_EnergyMeter_should_return_correct_values(_mocked_
         assert_sample_are_equals(sample, correct_sample)
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_stop_resume_stop_EnergyMeter_should_return_two_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.stop()
@@ -239,7 +239,7 @@ def test_start_stop_resume_stop_EnergyMeter_should_return_two_sample_trace(_mock
     assert len(energy_meter.get_trace()) == 2
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_stop_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2_5):
     energy_meter.start()
     energy_meter.stop()
@@ -250,7 +250,7 @@ def test_start_stop_resume_and_stop_EnergyMeter_should_return_correct_values(_mo
         assert_sample_are_equals(sample, correct_sample)
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_record_stop_resume_stop_EnergyMeter_should_return_three_sample_trace(_mocked_fun, energy_meter):
     energy_meter.start()
     energy_meter.record()
@@ -261,7 +261,7 @@ def test_start_record_stop_resume_stop_EnergyMeter_should_return_three_sample_tr
     assert len(energy_meter.get_trace()) == 3
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_start_record_stop_resume_and_stop_EnergyMeter_should_return_correct_values(_mocked_fun, energy_meter, sample1, sample2, sample3):
     energy_meter.start()
     energy_meter.record()
@@ -273,7 +273,7 @@ def test_start_record_stop_resume_and_stop_EnergyMeter_should_return_correct_val
         assert_sample_are_equals(sample, correct_sample)
 
 
-@patch('time.time_ns', side_effect=TIMESTAMP_TRACE)
+@patch('time.time', side_effect=TIMESTAMP_TRACE)
 def test_second_start_on_an_energy_meter_should_restart_the_trace(_mocked_fun, energy_meter, sample3):
     energy_meter.start()
     energy_meter.record()

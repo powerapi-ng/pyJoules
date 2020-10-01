@@ -17,13 +17,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from dataclasses import dataclass
 from typing import Dict, Any, List, Callable
 from functools import reduce
 from operator import and_
 
 
-@dataclass
 class EnergySample:
     """
     :var timestamp: begining timestamp
@@ -35,10 +33,11 @@ class EnergySample:
     :var energy: dictionary that contains the energy consumed during this sample
     :vartype: Dict[str, float]
     """
-    timestamp: float
-    tag: str
-    duration: float
-    energy: Dict[str, float]
+    def __init__(self, timestamp: float, tag: str, duration: float, energy: Dict[str, float]):
+        self.timestamp = timestamp
+        self.tag = tag
+        self.duration = duration
+        self.energy = energy
 
 
 class EnergyTrace:
