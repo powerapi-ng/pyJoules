@@ -24,7 +24,7 @@ Test to measure energy consumption of a trace only with the energy meter
 import pytest
 
 from mock import patch
-
+from pyJoules.energy_device import EnergyDeviceFactory
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
 from pyJoules.energy_device.nvidia_device import NvidiaGPUDevice, NvidiaGPUDomain
 from pyJoules.energy_meter import EnergyMeter
@@ -57,6 +57,55 @@ def test_measure_rapl_device_all_domains(_mocked_time_ns, fs_pkg_dram_one_socket
     nvidia.configure(domains=[NvidiaGPUDomain(0)])
 
     meter = EnergyMeter([rapl, nvidia])
+
+    correct_trace.add_new_sample('foo')  # test
+    meter.start(tag="foo")
+
+    correct_trace.add_new_sample('bar')  # test
+    meter.record(tag="bar")
+
+    correct_trace.add_new_sample('')  # test
+    meter.stop()
+
+    for sample1, sample2 in zip(correct_trace, meter.get_trace()):  # test
+        assert_sample_are_equals(sample1, sample2)  # test
+
+
+@patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
+def test_measure_rapl_device_all_domains_configuration_with_factory(_mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
+    domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
+
+    correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
+
+    devices = EnergyDeviceFactory.create_devices(domains)
+
+    meter = EnergyMeter(devices)
+
+    correct_trace.add_new_sample('foo')  # test
+    meter.start(tag="foo")
+
+    correct_trace.add_new_sample('bar')  # test
+    meter.record(tag="bar")
+
+    correct_trace.add_new_sample('')  # test
+    meter.stop()
+
+    for sample1, sample2 in zip(correct_trace, meter.get_trace()):  # test
+        assert_sample_are_equals(sample1, sample2)  # test
+
+
+INIT_TS2 = [0] * 9
+MOCKED_TIMESTAMP_TRACE2 = INIT_TS2 + FIRST_TS + SECOND_TS + THIRD_TS
+
+@patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE2)
+def test_measure_rapl_device_all_domains_configuration_with_factory_with_default_values(_mocked_time_ns, fs_pkg_dram_one_socket, one_gpu_api):
+    domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
+
+    correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
+
+    devices = EnergyDeviceFactory.create_devices()
+
+    meter = EnergyMeter(devices)
 
     correct_trace.add_new_sample('foo')  # test
     meter.start(tag="foo")
