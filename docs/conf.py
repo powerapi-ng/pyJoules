@@ -17,7 +17,7 @@ sys.path.append('../')
 
 # -- Project information -----------------------------------------------------
 
-project = 'pyRAPL'
+project = 'pyJoules'
 copyright = '2019, INRIA, University of Lille'
 author = 'INRIA, University of Lille'
 
