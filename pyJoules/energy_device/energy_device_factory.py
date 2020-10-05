@@ -23,11 +23,11 @@ import logging
 from operator import add
 from . import EnergyDomain, EnergyDevice
 from .rapl_device import RaplDevice
-try :
+try:
     from .nvidia_device import NvidiaGPUDevice
 except ImportError: 
     NvidiaGPUDevice=None
-    logging.warning(f'pynvml not found you can\'t use NVIDIA devices') 
+    logging.warning('pynvml not found you can\'t use NVIDIA devices') 
 
 from ..exception import NoSuchEnergyDeviceError
 
@@ -54,7 +54,8 @@ class EnergyDeviceFactory:
     def create_devices(domains: Optional[EnergyDomain] = None) -> List[EnergyDevice]:
         """
         Create and configure the EnergyDevice instance with the given EnergyDomains
-        :param domains: a list of EnergyDomain instance that as to be monitored
+        :param domains: a list of EnergyDomain instance that as to be monitored (if None, return a list of all
+                        monitorable devices)
         :return: a list of device configured with the given EnergyDomains
         :raise NoSuchEnergyDeviceError: if a domain depend on a device that doesn't exist on the current machine
         :raise NoSuchDomainError: if the given domain is not available on the device

@@ -141,7 +141,7 @@ class EnergyMeter:
         new_state = self._measure_new_state('__stop__')
         self._append_new_state(new_state)
 
-    def get_trace(self):
+    def get_trace(self) -> EnergyTrace:
         """
         return the current trace
         :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped

@@ -28,7 +28,7 @@ class EnergySample:
     :vartype timestamp: float
     :var tag: sample tag
     :vartype tag: str
-    :var duration: duration of the sample
+    :var duration: duration of the sample in seconds
     :vartype duration: float
     :var energy: dictionary that contains the energy consumed during this sample
     :vartype: Dict[str, float]
