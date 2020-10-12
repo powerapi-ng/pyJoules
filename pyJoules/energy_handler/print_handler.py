@@ -21,8 +21,8 @@
 from functools import reduce
 from operator import add
 
-from .. import EnergySample
-from . import EnergyHandler
+from ..energy_sample import EnergySample
+from .energy_handler import EnergyHandler
 
 
 class PrintHandler(EnergyHandler):

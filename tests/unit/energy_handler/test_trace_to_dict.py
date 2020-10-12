@@ -19,8 +19,8 @@
 # SOFTWARE.
 import pytest
 
-from pyJoules.energy_handler.energy_recorder.mongo_handler import trace_to_dict
-from pyJoules import EnergySample
+from pyJoules.energy_handler.mongo_handler import trace_to_dict
+from pyJoules.energy_sample import EnergySample
 
 @pytest.fixture
 def sample1():

@@ -22,8 +22,9 @@ import pytest
 import pyfakefs
 import os.path
 
-from pyJoules.energy_handler.energy_recorder.csv_handler import CSVHandler
-from pyJoules import EnergySample
+from pyJoules.energy_handler.csv_handler import CSVHandler
+from pyJoules.energy_handler import UnconsistantSamplesError
+from pyJoules.energy_sample import EnergySample, EnergyTrace
 
 
 @pytest.fixture
@@ -45,16 +46,54 @@ def sample2():
     return EnergySample(2, 'sample2', 3, {'d1': 3, 'd2': 4})
 
 
-def test_record_data_on_non_writable_file_raise_IOError(non_writable_folder, sample1):
+@pytest.fixture
+def bad_sample():
+    return EnergySample(2, 'sample2', 3, {'d1': 3, 'd3': 4})
+
+
+@pytest.fixture
+def bad_trace(bad_sample):
+    return EnergyTrace([bad_sample])
+
+
+@pytest.fixture
+def trace1(sample1):
+    return EnergyTrace([sample1])
+
+
+@pytest.fixture
+def trace2(sample1, sample2):
+    return EnergyTrace([sample1, sample2])
+
+
+def test_record_data_on_non_writable_file_raise_IOError(non_writable_folder, trace1):
     handler = CSVHandler('/dir/file.csv')
-    handler.process(sample1)
+    handler.process(trace1)
     with pytest.raises(IOError):
         handler.save_data()
 
 
-def test_process_one_sample_and_record_produce_a_file_with_one_correct_line(fs, sample1):
+def test_record_trace_with_unconsistent_sample_raise_UnconsistantSamplesError(fs, trace1, bad_trace):
     handler = CSVHandler('/file.csv')
-    handler.process(sample1)
+    handler.process(trace1)
+    handler.process(bad_trace)
+    with pytest.raises(UnconsistantSamplesError):
+        handler.save_data()
+
+
+def test_record_trace_with_unconsistent_sample_must_not_write_in_file(fs, trace1, bad_trace):
+    handler = CSVHandler('/file.csv')
+    handler.process(trace1)
+    handler.process(bad_trace)
+    try:
+        handler.save_data()
+    except UnconsistantSamplesError:
+        pass
+    assert not os.path.exists('/file.csv')
+
+def test_process_one_trace_and_record_produce_a_file_with_one_correct_line(fs, trace1):
+    handler = CSVHandler('/file.csv')
+    handler.process(trace1)
     handler.save_data()
 
     assert os.path.exists('/file.csv')
@@ -68,10 +107,10 @@ def test_process_one_sample_and_record_produce_a_file_with_one_correct_line(fs, 
         assert lines[1] == '1;sample1;2;1;2\n'
 
 
-def test_process_two_sample_and_record_produce_a_file_with_two_correct_lines(fs, sample1, sample2):
+def test_process_two_trace_and_record_produce_a_file_with_two_correct_lines(fs, trace1):
     handler = CSVHandler('/file.csv')
-    handler.process(sample1)
-    handler.process(sample2)
+    handler.process(trace1)
+    handler.process(trace1)
     handler.save_data()
 
     assert os.path.exists('/file.csv')
@@ -83,13 +122,13 @@ def test_process_two_sample_and_record_produce_a_file_with_two_correct_lines(fs,
         assert len(lines) == 3
         assert lines[0] == 'timestamp;tag;duration;d1;d2\n'
         assert lines[1] == '1;sample1;2;1;2\n'
-        assert lines[2] == '2;sample2;3;3;4\n'
+        assert lines[2] == '1;sample1;2;1;2\n'
 
-def test_process_one_sample_record_it_process_another_sample_and_record_it_produce_a_file_with_two_correct_lines(fs, sample1, sample2):
+
+def test_process_one_trace_with_one_sample_and_one_trace_with_two_sample_and_record_produce_a_file_with_three_correct_lines(fs, trace1, trace2):
     handler = CSVHandler('/file.csv')
-    handler.process(sample1)
-    handler.save_data()
-    handler.process(sample2)
+    handler.process(trace1)
+    handler.process(trace2)
     handler.save_data()
 
     assert os.path.exists('/file.csv')
@@ -98,17 +137,18 @@ def test_process_one_sample_record_it_process_another_sample_and_record_it_produ
         for line in csv:
             lines.append(line)
 
-        assert len(lines) == 3
+        assert len(lines) == 4
         assert lines[0] == 'timestamp;tag;duration;d1;d2\n'
         assert lines[1] == '1;sample1;2;1;2\n'
-        assert lines[2] == '2;sample2;3;3;4\n'
+        assert lines[2] == '1;sample1;2;1;2\n'
+        assert lines[3] == '2;sample2;3;3;4\n'
 
 
-def test_process_one_sample_and_record_in_existing_file_only_append_one_correct_line(fs, sample2):
+def test_process_one_trace_and_record_in_existing_file_only_append_one_correct_line(fs, trace1):
     fs.create_file('/file.csv', contents='timestamp;tag;duration;d1;d2\n1;sample1;2;1;2\n')
 
     handler = CSVHandler('/file.csv')
-    handler.process(sample2)
+    handler.process(trace1)
     handler.save_data()
 
     assert os.path.exists('/file.csv')
@@ -120,4 +160,4 @@ def test_process_one_sample_and_record_in_existing_file_only_append_one_correct_
         assert len(lines) == 3
         assert lines[0] == 'timestamp;tag;duration;d1;d2\n'
         assert lines[1] == '1;sample1;2;1;2\n'
-        assert lines[2] == '2;sample2;3;3;4\n'
+        assert lines[1] == '1;sample1;2;1;2\n'

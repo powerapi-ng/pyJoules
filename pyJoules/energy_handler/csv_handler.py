@@ -17,30 +17,46 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import os.path
 
-from .. import EnergyHandler
+from . import EnergyHandler
 
+class CSVHandler(EnergyHandler):
 
-class EnergyRecorder(EnergyHandler):
-    """
-    A statefull object that can format and save the measured value of an energy trace
-    The recorder have a buffer that can store the handled EnergyTrace and store every trace in the buffer in one atomic
-    action
-    """
-
-    def __init__(self):
+    def __init__(self, filename):
         EnergyHandler.__init__(self)
 
-        self.trace_buffer = []
+        self._filename = filename
 
-    def process(self, sample):
-        """
-        Add the trace to the buffer
-        """
-        self.trace_buffer.append(sample)
+    def _gen_header(self, first_sample):
+        domain_names = first_sample.energy.keys()
+        return 'timestamp;tag;duration;' + ';'.join(domain_names)
+
+    def _gen_sample_line(self, sample, domain_names):
+        line_begining = f'{sample.timestamp};{sample.tag};{sample.duration};'
+        energy_values = [str(sample.energy[domain]) for domain in domain_names]
+        return line_begining + ';'.join(energy_values)
+
+    def _init_file(self, first_sample):
+        if os.path.exists(self._filename):
+            csv_file = open(self._filename, 'a+')
+            return csv_file
+        else:
+            csv_file = open(self._filename, 'w+')
+            csv_file.write(self._gen_header(first_sample) + '\n')
+            return csv_file
 
     def save_data(self):
         """
         Save each trace contained in the buffer and empty the buffer
         """
-        raise NotImplementedError()
+        flatened_trace = self._flaten_trace()
+        first_sample = flatened_trace[0]
+        domain_names = first_sample.energy.keys()
+
+        csv_file = self._init_file(first_sample)
+
+        for sample in flatened_trace:
+            csv_file.write(self._gen_sample_line(sample, domain_names) + '\n')
+        csv_file.close()
+        self.traces = []

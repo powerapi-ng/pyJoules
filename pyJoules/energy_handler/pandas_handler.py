@@ -26,7 +26,7 @@ except ImportError:
     logging.getLogger().info("Pandas is not installed.")
 
 from . import EnergyHandler, UnconsistantSamplesError
-from .. import EnergySample
+from ..energy_sample import EnergyTrace, EnergySample
 
 
 def _gen_column_names(samples):
@@ -36,18 +36,6 @@ def _gen_column_names(samples):
     for domain_name in sample.energy:
         names.append(domain_name)
     return names
-
-
-def _check_samples(samples):
-    sample1 = samples[0]
-
-    for sample in samples:
-        if len(sample.energy) != len(sample1.energy):
-            return False
-        for domain_name, domain_name1 in zip(sample.energy, sample1.energy):
-            if domain_name != domain_name1:
-                return False
-    return True
 
 
 def _gen_data(samples):
@@ -72,9 +60,6 @@ def trace_to_dataframe(trace: Iterable[EnergySample]) -> pandas.DataFrame:
     if len(trace) == 0:
         return pandas.DataFrame()
 
-    if not _check_samples(trace):
-        raise UnconsistantSamplesError()
-
     return pandas.DataFrame(columns=_gen_column_names(trace), data=_gen_data(trace))
 
 
@@ -90,15 +75,16 @@ class PandasHandler(EnergyHandler):
     """
     def __init__(self):
         EnergyHandler.__init__(self)
-        self.samples = []
+        self.traces = []
 
-    def process(self, sample: EnergySample):
-        self.samples.append(sample)
+    def process(self, trace: EnergyTrace):
+        self.traces.append(trace)
 
     def get_dataframe(self) -> pandas.DataFrame:
         """
         return the DataFrame containing the processed samples
         """
-        if len(self.samples) > 0:
-            return trace_to_dataframe(self.samples)
+        if len(self.traces) > 0:
+            faltened_trace = self._flaten_trace()
+            return trace_to_dataframe(faltened_trace)
         raise NoSampleProcessedError()

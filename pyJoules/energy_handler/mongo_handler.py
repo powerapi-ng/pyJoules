@@ -25,8 +25,8 @@ except ImportError:
     import logging
     logging.getLogger().info("PyMongo is not installed.")
 
-from . import EnergyRecorder
-from ... import EnergySample
+from . import EnergyHandler
+from ..energy_sample import EnergySample
 
 
 def sample_to_dict(sample: EnergySample) -> Dict:
@@ -58,9 +58,9 @@ class MongoInitError(Exception):
     """
 
 
-class MongoHandler(EnergyRecorder):
+class MongoHandler(EnergyHandler):
 
-    def __init__(self, uri: str, database_name: str, collection_name: str, connected_timeout: int = 30000):
+    def __init__(self, uri: str, database_name: str, collection_name: str, connected_timeout: int = 30000, trace_name_prefix: str = 'trace_'):
         """
         Create a handler that will store data on mongo database
 
@@ -69,12 +69,16 @@ class MongoHandler(EnergyRecorder):
                                    appropriate server to carry out a database operation; while it is waiting, multiple
                                    server monitoring operations may be carried out, each controlled by connectTimeoutMS.
                                    Defaults to 30000 (30 seconds).
+        :param trace_name_prefix: prefix of the trace name used to identify a trace in mongo database. The trace name is
+                                  computed as follow : trace_name_prefix + trace_position (trace position is the
+                                  position of the current trace in the trace list processed by the handler)
 
         """
-        EnergyRecorder.__init__(self)
+        EnergyHandler.__init__(self)
 
         self.collection = None
         self.trace_id = 0
+        self.trace_name_prefix = trace_name_prefix
 
         self._init_database(uri, connected_timeout, database_name, collection_name)
 
@@ -95,10 +99,9 @@ class MongoHandler(EnergyRecorder):
         Save each trace contained in the buffer and empty the buffer
         """
         documents = []
-        for trace in self.trace_buffer:
-            documents.append(trace_to_dict(trace, 'trace_' + str(self.trace_id)))
+        for trace in self.traces:
+            documents.append(trace_to_dict(trace, self.trace_name_prefix + str(self.trace_id)))
             self.trace_id += 1
-
         self._collection.insert_many(documents)
 
-        self.trace_buffer = []
+        self.traces = []

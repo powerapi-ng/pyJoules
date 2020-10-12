@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .. import EnergySample
+from ..energy_sample import EnergyTrace
 
 
 class UnconsistantSamplesError(Exception):
@@ -27,12 +27,35 @@ class UnconsistantSamplesError(Exception):
     """
 
 
+def _check_samples(samples):
+    sample1 = samples[0]
+
+    for sample in samples:
+        if len(sample.energy) != len(sample1.energy):
+            return False
+        for domain_name, domain_name1 in zip(sample.energy, sample1.energy):
+            if domain_name != domain_name1:
+                return False
+    return True
+
+
 class EnergyHandler:
     """
     An object that can handle the measured value of an energy trace
     """
 
-    def process(self, sample: EnergySample):
+    def __init__(self):
+        self.traces = []
+
+    def process(self, trace: EnergyTrace):
         """
         """
-        raise NotImplementedError()
+        self.traces.append(trace)
+
+    def _flaten_trace(self):
+        flatened_trace = EnergyTrace([])
+        for trace in self.traces:
+            flatened_trace += trace
+        if not _check_samples(flatened_trace):
+            raise UnconsistantSamplesError()
+        return flatened_trace
