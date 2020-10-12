@@ -90,6 +90,66 @@ def test_create_a_trace_from_a_localy_defined_list_and_modify_the_list_musnt_mod
     assert trace[0] != 0
 
 
+def test_append_sample_to_a_trace_with_one_sample_create_a_trace_with_two_sample(trace_with_one_sample):
+    trace_with_one_sample.append(SAMPLE_1)
+    assert len(trace_with_one_sample) == 2
+
+
+def test_append_sample_to_a_trace_with_one_sample_create_a_trace_with_two_correct_sample(trace_with_one_sample):
+    trace_with_one_sample.append(SAMPLE_2)
+    assert trace_with_one_sample[0] == SAMPLE_1
+    assert trace_with_one_sample[1] == SAMPLE_2
+
+
+def test_append_sample_to_a_trace_with_one_sample_create_a_trace_with_two_correct_sample(trace_with_one_sample):
+    trace_with_one_sample.append(SAMPLE_2)
+    assert trace_with_one_sample[0] == SAMPLE_1
+    assert trace_with_one_sample[1] == SAMPLE_2
+
+
+def test_add_two_trace_with_one_sample_produce_a_trace_of_length_two(trace_with_one_sample):
+    assert len(trace_with_one_sample + trace_with_one_sample) == 2
+
+
+def test_add_one_trace_with_one_sample_and_one_trace_with_two_sample_tproduce_a_trace_of_length_three(trace_with_one_sample, trace_with_two_sample):
+    assert len(trace_with_one_sample + trace_with_two_sample) == 3
+
+
+def test_add_two_trace_with_one_sample_produce_a_trace_with_correct_values(trace_with_one_sample):
+    trace = trace_with_one_sample + trace_with_one_sample
+    assert trace[0] == SAMPLE_1
+    assert trace[1] == SAMPLE_1
+
+
+def test_add_one_trace_with_one_sample_and_one_trace_with_two_sample_tproduce_a_trace_with_correct_values(trace_with_one_sample, trace_with_two_sample):
+    trace = trace_with_one_sample + trace_with_two_sample
+    assert trace[0] == SAMPLE_1
+    assert trace[1] == SAMPLE_1
+    assert trace[2] == SAMPLE_2
+
+
+def test_iadd_a_trace_with_one_sample_to_a_trace_with_one_sample_create_a_trace_with_two_sample(trace_with_one_sample):
+    trace_with_one_sample += trace_with_one_sample
+    assert len(trace_with_one_sample) == 2
+
+
+def test_iadd_a_trace_with_one_sample_to_a_trace_with_one_sample_create_a_trace_with_two_correct_sample(trace_with_one_sample):
+    trace_with_one_sample += trace_with_one_sample
+    assert trace_with_one_sample[0] == SAMPLE_1
+    assert trace_with_one_sample[1] == SAMPLE_1
+
+
+def test_iadd_a_trace_with_two_sample_to_a_trace_with_one_sample_create_a_trace_with_three_sample(trace_with_one_sample, trace_with_two_sample):
+    trace_with_one_sample += trace_with_two_sample
+    assert len(trace_with_one_sample) == 3
+
+
+def test_iadd_a_trace_with_two_sample_to_a_trace_with_one_sample_create_a_trace_with_three_correct_sample(trace_with_one_sample, trace_with_two_sample):
+    trace_with_one_sample += trace_with_two_sample
+    assert trace_with_one_sample[0] == SAMPLE_1
+    assert trace_with_one_sample[1] == SAMPLE_1
+    assert trace_with_one_sample[2] == SAMPLE_2
+
 ##################
 # DICT INTERFACE #
 ##################

@@ -84,8 +84,22 @@ class EnergyTrace:
         """
         return len(self._samples)
 
-    def __contains__(self, key):
+    def __contains__(self, key: str):
         return not self._get_sample_from_tag(key) is None
+
+    def __add__(self, trace:  'EnergySample'):
+        samples = self._samples + trace._samples
+        return EnergyTrace(samples)
+
+    def __iadd__(self, trace: 'EnergySample'):
+        self._samples += trace._samples
+        return self
+
+    def append(self, sample: EnergySample):
+        """
+        append a new sample to the trace
+        """
+        self._samples.append(sample)
 
     def remove_idle(self, idle: List[Dict[str, float]]):
         """
