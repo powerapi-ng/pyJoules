@@ -19,11 +19,17 @@
 # SOFTWARE.
 
 def assert_sample_are_equals(sample1, sample2):
+    print((sample1.timestamp, sample2.timestamp))
     assert sample1.timestamp == sample2.timestamp
+    print((sample1.tag, sample2.tag))
     assert sample1.tag == sample2.tag
+    print((sample1.duration, sample2.duration))
     assert sample1.duration == sample2.duration
 
+    print((len(sample1.energy), len(sample2.energy)))
     assert len(sample1.energy) == len(sample2.energy)
     for key in sample1.energy:
+        print((key, sample2.energy))
         assert key in sample2.energy
+        print((sample1.energy[key], sample2.energy[key]))
         assert sample1.energy[key] == sample2.energy[key]

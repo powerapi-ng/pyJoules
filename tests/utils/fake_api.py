@@ -48,7 +48,6 @@ class CorrectTrace:
         new_values = {}
         for domain in self.domains:
             fake_api = self.fake_api[domain.get_device_type()]
-            
             new_values[str(domain)] = fake_api.domains_current_energy[str(domain)]
         return new_values
 
@@ -74,6 +73,12 @@ class CorrectTrace:
             for domain in self.domains:
                 sample[str(domain)] = next_state[str(domain)] - current_state[str(domain)]
             current_state = next_state
+            trace.append(sample)
+        return trace
+
+    def get_trace(self):
+        trace = []
+        for sample in self:
             trace.append(sample)
         return trace
 

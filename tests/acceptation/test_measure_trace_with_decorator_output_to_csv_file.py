@@ -19,15 +19,15 @@
 # SOFTWARE.
 
 """
-Test to measure energy consumption of a trace only with the energy meter
+decorate a function and measure its energy consumption, output the energy consumption in a csv file
 """
 import pytest
-
 from mock import patch
 
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
 from pyJoules.energy_meter import EnergyMeter, measureit
 from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+from pyJoules.energy_handler.csv_handler import CSVHandler
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
 from ..utils.fake_nvidia_api import one_gpu_api
 from .. utils.fake_api import CorrectTrace
@@ -39,31 +39,35 @@ from ..utils.sample import assert_sample_are_equals
 INIT_TS = [0] * 5
 FIRST_TS = [1.1] * 7
 SECOND_TS = [2.2] * 7
-MOCKED_TIMESTAMP_TRACE = INIT_TS + FIRST_TS + SECOND_TS
+CSV_WRITING_TS = [1, 2, 3, 5, 6, 7, 8, 9]
+MOCKED_TIMESTAMP_TRACE = INIT_TS + FIRST_TS + SECOND_TS + CSV_WRITING_TS
 TIMESTAMP_TRACE = [1.1, 2.2]
 
 
-@patch('pyJoules.energy_handler.EnergyHandler')
 @patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
-def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
-
+def test_measure_rapl_device_all_domains(_mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
     domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
+    correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)
 
-    correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
+    csv_handler = CSVHandler('result.csv')
+    @measureit(handler=csv_handler, domains=domains)
+    def foo():
+        correct_trace.add_new_sample('stop')
+        return 1
+    correct_trace.add_new_sample('begin')
+    foo()
+    csv_handler.save_data()
+    csv_file = open('result.csv', 'r')
 
-    @measureit(handler=mocked_handler, domains=domains)
-    def measured_function(val):
-        correct_trace.add_new_sample('stop')  # test
-        return val + 1
+    lines = []
 
-    assert mocked_handler.process.call_count == 0   # test
-    correct_trace.add_new_sample('measured_function')
-    returned_value = measured_function(1)
-    assert mocked_handler.process.call_count == 1   # test
+    for line in csv_file:
+        lines.append(line.strip().split(';'))
+    assert float(lines[1][0]) == TIMESTAMP_TRACE[0]
+    assert lines[1][1] == 'foo'
+    assert float(lines[1][2]) == TIMESTAMP_TRACE[1] - TIMESTAMP_TRACE[0]
+    correct_sample = correct_trace.get_trace()[0]
 
-    assert returned_value == 2
-    assert len(correct_trace.get_trace()) == len(mocked_handler.process.call_args_list)
-
-    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
-        measured_sample = processed_arg[0][0][0]  # test
-        assert_sample_are_equals(correct_sample, measured_sample)  # test
+    for key in correct_sample.energy:
+        assert key in lines[0]
+        assert correct_sample.energy[key] == float(lines[1][lines[0].index(key)])

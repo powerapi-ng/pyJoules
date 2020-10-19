@@ -71,17 +71,11 @@ def test_measure_rapl_device_default_values(mocked_handler, _mocked_time, fs_pkg
     correct_trace = CorrectTrace([RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)],
                                  [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
-    print('==================')
     correct_trace.add_new_sample('start')  # test
-    print('--------------------')
     with EnergyContext(mocked_handler) as energy_context:
-        print('=====================')
         correct_trace.add_new_sample('second_tag')  # test
-        print('--------------------')
         energy_context.record(tag='second_tag')
-        print('=====================')
         correct_trace.add_new_sample('')  # test
-        print('--------------------')
 
     assert mocked_handler.process.call_count == 2   # test
 

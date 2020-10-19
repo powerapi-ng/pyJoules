@@ -26,8 +26,9 @@ import pytest
 from mock import patch
 
 from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
-from pyJoules.energy_meter import EnergyMeter, measureit
 from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+from pyJoules.energy_meter import EnergyMeter, EnergyContext
+from pyJoules.energy_handler.csv_handler import CSVHandler
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
 from ..utils.fake_nvidia_api import one_gpu_api
 from .. utils.fake_api import CorrectTrace
@@ -36,34 +37,56 @@ from ..utils.sample import assert_sample_are_equals
 
 # We mock time.time function that is used by pyfakefs each time an operation on filesystem is done. we have to give
 # consistant time return value to time.time that will be used by pyfakefs
-INIT_TS = [0] * 5
-FIRST_TS = [1.1] * 7
+FIRST_TS = [1.1] * 12
 SECOND_TS = [2.2] * 7
-MOCKED_TIMESTAMP_TRACE = INIT_TS + FIRST_TS + SECOND_TS
-TIMESTAMP_TRACE = [1.1, 2.2]
+THIRD_TS = [3.3] * 7
+CSV_WRITING_TS = [1] * 3
+MOCKED_TIMESTAMP_TRACE = FIRST_TS + SECOND_TS + THIRD_TS + CSV_WRITING_TS
+TIMESTAMP_TRACE = [1.1, 2.2, 3.3]
 
-
-@patch('pyJoules.energy_handler.EnergyHandler')
 @patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
+@patch('pyJoules.energy_handler.EnergyHandler')
 def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
-
+    print('init--------------')
     domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
 
     correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
-    @measureit(handler=mocked_handler, domains=domains)
-    def measured_function(val):
-        correct_trace.add_new_sample('stop')  # test
-        return val + 1
 
-    assert mocked_handler.process.call_count == 0   # test
-    correct_trace.add_new_sample('measured_function')
-    returned_value = measured_function(1)
-    assert mocked_handler.process.call_count == 1   # test
+    csv_handler = CSVHandler('result.csv')
+    print('1--------------')
+    correct_trace.add_new_sample('foo')
+    with EnergyContext(handler=csv_handler, domains=domains, start_tag='foo') as ctx:
+        print('2--------------')
+        correct_trace.add_new_sample('bar')
+        ctx.record(tag='bar')
+        print('3--------------')
+        correct_trace.add_new_sample('')
+    print('save--------------')
+    print(csv_handler.traces)
+    csv_handler.save_data()
+    print('test--------------')
+    csv_file = open('result.csv', 'r')
 
-    assert returned_value == 2
-    assert len(correct_trace.get_trace()) == len(mocked_handler.process.call_args_list)
+    lines = []
 
-    for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
-        measured_sample = processed_arg[0][0][0]  # test
-        assert_sample_are_equals(correct_sample, measured_sample)  # test
+    for line in csv_file:
+        lines.append(line.strip().split(';'))
+    assert float(lines[1][0]) == TIMESTAMP_TRACE[0]
+    assert lines[1][1] == 'foo'
+    assert float(lines[1][2]) == TIMESTAMP_TRACE[1] - TIMESTAMP_TRACE[0]
+    correct_sample = correct_trace.get_trace()[0]
+
+    for key in correct_sample.energy:
+        assert key in lines[0]
+        assert correct_sample.energy[key] == float(lines[1][lines[0].index(key)])
+
+
+    assert float(lines[2][0]) == TIMESTAMP_TRACE[1]
+    assert lines[2][1] == 'bar'
+    assert float(lines[2][2]) == TIMESTAMP_TRACE[2] - TIMESTAMP_TRACE[1]
+    correct_sample = correct_trace.get_trace()[1]
+
+    for key in correct_sample.energy:
+        assert key in lines[0]
+        assert correct_sample.energy[key] == float(lines[2][lines[0].index(key)])

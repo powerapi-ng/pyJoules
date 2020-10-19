@@ -97,6 +97,7 @@ class EnergyMeter:
     def start(self, tag: Optional[str] = None):
         """
         Begin a new energy trace
+
         :param tag: sample name
         """
         new_state = self._measure_new_state(tag)
@@ -106,6 +107,7 @@ class EnergyMeter:
     def record(self, tag: Optional[str] = None):
         """
         Add a new state to the Trace
+
         :param tag: sample name
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
@@ -118,6 +120,7 @@ class EnergyMeter:
     def resume(self, tag: Optional[str] = None):
         """
         resume the energy Trace (if no energy trace was launched, start a new one
+
         :param tag: sample name
         :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
         """
@@ -133,6 +136,7 @@ class EnergyMeter:
     def stop(self):
         """
         Set the end of the energy trace
+
         :raise EnergyMeterNotStartedError: if the energy meter isn't started
         """
         if not self._is_meter_started():
@@ -143,7 +147,8 @@ class EnergyMeter:
 
     def get_trace(self) -> EnergyTrace:
         """
-        return the current trace
+        return the last trace measured
+
         :raise EnergyMeterNotStoppedError: if the energy meter isn't stopped
         """
         if not self._is_meter_started():
@@ -169,6 +174,7 @@ class EnergyMeter:
         """
         generate idle values of an energy trace
         for each sample, wait for the duraction of a sample and measure the energy consumed during this period
+
         :return: the list of idle energy consumption for each sample in the trace
         """
         self._reinit()
@@ -275,6 +281,7 @@ class EnergyState:
 def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
+
     :param handler: handler instance that will receive the power consummation data
     :param domains: list of the monitored energy domains
     """
@@ -288,8 +295,7 @@ def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optio
             energy_meter.start(tag=func.__name__)
             val = func(*args, **kwargs)
             energy_meter.stop()
-            for sample in energy_meter.get_trace():
-                handler.process(sample)
+            handler.process(energy_meter.get_trace())
             return val
         return wrapper_measure
 
@@ -302,7 +308,14 @@ def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optio
 
 class EnergyContext():
 
-    def __init__(self, handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None, start_tag='start'):
+    def __init__(self, handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None, start_tag: str = 'start'):
+        """
+        Measure the energy consumption of monitored devices during the execution of the contextualized code
+
+        :param handler: handler instance that will receive the power consummation data
+        :param domains: list of the monitored energy domains
+        :param start_tag: first tag of the trace
+        """
         self.handler = handler
         self.start_tag = start_tag
 
@@ -315,5 +328,4 @@ class EnergyContext():
 
     def __exit__(self, type, value, traceback):
         self.energy_meter.stop()
-        for sample in self.energy_meter.get_trace():
-            self.handler.process(sample)
+        self.handler.process(self.energy_meter.get_trace())
