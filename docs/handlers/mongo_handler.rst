@@ -61,3 +61,10 @@ with :
 - BBBB* duration of the measured interval (in seconds)
 - CCCC* energy consumed by CPU 0 during the measured interval
 - DDDD* energy consumed by GPU 0 during the measured interval
+
+Trace name
+^^^^^^^^^^
+
+Each trace stored in the database is named. Trace name is computed by adding an integer (which is incremented each time a new trace is stored) to a string prefix. By default, this prefix is ``trace`` so the first trace you store will be named ``trace_0``, the second ``trace_1``.
+
+You can change this default prefix by specifying the ``trace_name_prefix`` with the prefix you want to use.
