@@ -31,7 +31,7 @@ class EnergySample:
     :var duration: duration of the sample in seconds
     :vartype duration: float
     :var energy: dictionary that contains the energy consumed during this sample
-    :vartype: Dict[str, float]
+    :vartype energy: Dict[str, float]
     """
     def __init__(self, timestamp: float, tag: str, duration: float, energy: Dict[str, float]):
         self.timestamp = timestamp
@@ -45,6 +45,9 @@ class EnergyTrace:
     Trace of all EnergySample collected by a meter
     """
     def __init__(self, samples: List[EnergySample]):
+        """
+        :param samples: samples containing in the trace
+        """
         self._samples = []
         for sample in samples:
             self._samples.append(sample)
@@ -57,6 +60,7 @@ class EnergyTrace:
     def __getitem__(self, key: Any) -> EnergySample:
         """
         Return the n-th EnergySample on the trace or the first sample with the given tag
+
         :param key: integer to get the n-th EnergySample or the tag of the needed sample
         :return: An EnergySample
         :raise KeyError: if no sample match the given tag
@@ -104,6 +108,7 @@ class EnergyTrace:
     def remove_idle(self, idle: List[Dict[str, float]]):
         """
         substract idle energy values from the current trace
+
         :param idle: list of idle consumption values to substract to current trace
                      idle consumption values must be grouped in a dictionary with their domain as key
         :raise ValueError: if the number of values in the list doesn't match the number of sample in the trace
@@ -127,7 +132,6 @@ class EnergyTrace:
     def clean_data(self, guards: List[Callable[[EnergySample], bool]] = []):
         """
         Remove sample with negative energy values from the trace
-
         Guards can be added to specify rules to remove sample
 
         :param guards: list of function that is used as rules to remove samples. A guard is a function that take a

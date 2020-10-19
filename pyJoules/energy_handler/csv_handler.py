@@ -23,7 +23,10 @@ from . import EnergyHandler
 
 class CSVHandler(EnergyHandler):
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
+        """
+        :param filename: file name to store processed trace
+        """
         EnergyHandler.__init__(self)
 
         self._filename = filename
@@ -48,7 +51,7 @@ class CSVHandler(EnergyHandler):
 
     def save_data(self):
         """
-        Save each trace contained in the buffer and empty the buffer
+        append processed trace to the file
         """
         flatened_trace = self._flaten_trace()
         first_sample = flatened_trace[0]

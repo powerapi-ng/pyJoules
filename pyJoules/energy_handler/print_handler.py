@@ -21,17 +21,17 @@
 from functools import reduce
 from operator import add
 
-from ..energy_sample import EnergySample
+from ..energy_sample import EnergyTrace
 from .energy_handler import EnergyHandler
 
 
 class PrintHandler(EnergyHandler):
 
-    def process(self, sample: EnergySample):
+    def process(self, trace: EnergyTrace):
         """
         Print the given sample on the standard output
         """
-        begin_string = f'begin timestamp : {sample.timestamp}; tag : {sample.tag}; duration : {sample.duration}'
-        energy_strings = [f'; {domain} : {value}' for domain, value in sample.energy.items()]
+        begin_string = f'begin timestamp : {trace.timestamp}; tag : {trace.tag}; duration : {trace.duration}'
+        energy_strings = [f'; {domain} : {value}' for domain, value in trace.energy.items()]
 
         print(reduce(add, energy_strings, begin_string))

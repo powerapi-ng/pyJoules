@@ -54,6 +54,7 @@ class EnergyDeviceFactory:
     def create_devices(domains: Optional[EnergyDomain] = None) -> List[EnergyDevice]:
         """
         Create and configure the EnergyDevice instance with the given EnergyDomains
+
         :param domains: a list of EnergyDomain instance that as to be monitored (if None, return a list of all
                         monitorable devices)
         :return: a list of device configured with the given EnergyDomains

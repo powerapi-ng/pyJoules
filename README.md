@@ -103,7 +103,7 @@ If you want to handle data with different output than the standard one, you can 
 As an example, if you want to write the recorded energy consumption in a .csv file:
 ```python
 from pyJoules.energy_meter import measureit
-from pyJoules.energy_handler.energy_recorder import CsvHandler
+from pyJoules.energy_handler.energy_recorder import CSVHandler
 	
 csv_handler = CSVHandler('result.csv')
 	

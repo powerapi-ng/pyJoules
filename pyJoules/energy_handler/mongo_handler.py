@@ -96,7 +96,7 @@ class MongoHandler(EnergyHandler):
 
     def save_data(self):
         """
-        Save each trace contained in the buffer and empty the buffer
+        Save processed trace on the database
         """
         documents = []
         for trace in self.traces:

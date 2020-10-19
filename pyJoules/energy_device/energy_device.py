@@ -51,6 +51,7 @@ class EnergyDevice:
         """
         configure the device to return only the energy consumption of the given energy domain when calling the
         :py:meth:`pyJoules.energy_device.EnergyDevice.get_energy` method
+
         :param domains: domains to be monitored by the device, if None, all the available domain will be monitored
         :raise NoSuchDomainError: if one given domain could not be monitored on this machine
         """
@@ -67,6 +68,7 @@ class EnergyDevice:
     def get_energy(self) -> List[float]:
         """
         Get the energy consumption of the device since the last device reset
+
         :return: a list of each domain power consumption. Value order is the same than the domain order passed as
                  argument to the :py:meth:`pyJoules.energy_device.EnergyDevice.configure` method.
         """
@@ -75,6 +77,7 @@ class EnergyDevice:
     def get_configured_domains(self):
         """
         Get the domains that was passed as argument to the configure function
+
         :return: A list of EnergyDomain
         :raise NotConfiguredDeviceException: if the device was not configured
         """

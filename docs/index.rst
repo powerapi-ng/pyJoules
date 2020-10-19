@@ -41,7 +41,7 @@ Nvidia GPU
 __ https://en.wikipedia.org/wiki/Volta_(microarchitecture)
 
 Monitor only function energy consumption
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 **pyjoules** monitor device energy consumption. The reported energy consumption is not only the energy consumption of the code you are running. This includes the *global energy consumption* of all the process running on the machine during this period, thus including the operating system and other applications.
 
 That is why we recommend to eliminate any extra programs that may alter the energy consumption of the machine hosting experiments and to keep only the code under measurement (*i.e.*, no extra applications, such as graphical interface, background running task...). This will give the closest measure to the real energy consumption of the measured code.
