@@ -56,10 +56,10 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dr
         energy_context.record(tag='bar')
         correct_trace.add_new_sample('')  # test
 
-    assert mocked_handler.process.call_count == 2   # test
+    assert mocked_handler.process.call_count == 1   # test
 
     for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
-        measured_sample = processed_arg[0][0]  # test
+        measured_sample = processed_arg[0][0][0]  # test
 
         assert_sample_are_equals(correct_sample, measured_sample)  # test
 
@@ -77,8 +77,8 @@ def test_measure_rapl_device_default_values(mocked_handler, _mocked_time, fs_pkg
         energy_context.record(tag='second_tag')
         correct_trace.add_new_sample('')  # test
 
-    assert mocked_handler.process.call_count == 2   # test
+    assert mocked_handler.process.call_count == 1
 
     for correct_sample, processed_arg in zip(correct_trace, mocked_handler.process.call_args_list):  # test
-        measured_sample = processed_arg[0][0]  # test
+        measured_sample = processed_arg[0][0][0]  # test
         assert_sample_are_equals(correct_sample, measured_sample)  # test
