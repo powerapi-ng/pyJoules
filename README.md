@@ -121,9 +121,6 @@ This will produce a csv file of 100 lines. Each line containing the energy
 consumption recorded during one execution of the function `foo`.
 Other predefined `Handler` classes exist to export data to *MongoDB* and *Panda*
 dataframe.
-You can also create your own Output class (see the
-[documentation](https://pyJoules.readthedocs.io/en/latest/Handler_API.html))
-
 
 ## Use a context manager to add tagged "_breakpoint_" in your measurment
 

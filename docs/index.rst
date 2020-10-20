@@ -52,7 +52,7 @@ Quickstart
 Installation
 ------------
 
-You can install **pyRAPL** with pip : ``pip install pyRAPL``
+You can install **pyJoules** with pip : ``pip install pyJoules``
 
 Decorate a function to measure its energy consumption
 -----------------------------------------------------
