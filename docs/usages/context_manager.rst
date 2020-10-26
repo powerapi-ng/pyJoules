@@ -15,9 +15,9 @@ and report it in a csv file
 .. code-block:: python
 
    from pyJoules.energy_meter import EnergyContext
-   from pyJoules.energy_device.rapl_device import RaplPackageDomain
-   from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
-   from pyJoules.energy_handler.csv_handler import CSVHandler
+   from pyJoules.device.rapl_device import RaplPackageDomain
+   from pyJoules.device.nvidia_device import NvidiaGPUDomain
+   from pyJoules.handler.csv_handler import CSVHandler
 	
    csv_handler = CSVHandler('result.csv')
 	

@@ -23,7 +23,7 @@ import random
 import pytest
 import pyfakefs
 
-from pyJoules.energy_device.rapl_device import RaplDevice
+from pyJoules.device.rapl_device import RaplDevice
 from .fake_api import FakeAPI
 
 

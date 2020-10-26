@@ -14,7 +14,7 @@ Example :
 
 .. code-block:: python
 
-   from pyJoules.energy_handler.csv_handler import CSVHandler
+   from pyJoules.handler.csv_handler import CSVHandler
    csv_handler = CSVHandler('result.csv')
 		
    with EnergyContext(handler=csv_handler, domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)], start_tag='foo') as ctx:

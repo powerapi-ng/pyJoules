@@ -19,7 +19,7 @@
 # SOFTWARE.
 import pytest
 
-from pyJoules.energy_sample import EnergyTrace, EnergySample
+from pyJoules.energy_trace import EnergyTrace, EnergySample
 
 
 SAMPLE_1 = EnergySample('123', 'tag1', 10, {'domain1': 1, 'domain2': 2})

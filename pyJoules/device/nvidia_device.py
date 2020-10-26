@@ -21,14 +21,14 @@
 from typing import List
 
 
-from . import EnergyDevice, EnergyDomain
-from ..exception import PyJoulesException, NoSuchEnergyDeviceError
+from . import Device, Domain
+from ..exception import PyJoulesException, NoSuchDeviceError
 import pynvml
 
-class NvidiaGPUDomain(EnergyDomain):
+class NvidiaGPUDomain(Domain):
 
     def __init__(self, device_id):
-        EnergyDomain.__init__(self)
+        Domain.__init__(self)
         self.device_id = device_id
         self._repr = 'nvidia_gpu_' + str(device_id)
 
@@ -58,21 +58,21 @@ class GPUDoesNotSupportEnergyMonitoringError(PyJoulesException):
     """
 
 
-class NvidiaGPUDevice(EnergyDevice):
+class NvidiaGPUDevice(Device):
     """
     Interface to get energy consumption of GPUs
     """
 
     def __init__(self):
         """
-        :raise NoSuchEnergyDeviceError: if no Nvidia API is available on this machine
+        :raise NoSuchDeviceError: if no Nvidia API is available on this machine
         :raise GPUDoesNotSupportEnergyMonitoringError: if the GPU does not support energy monitoring
         """
-        EnergyDevice.__init__(self)
+        Device.__init__(self)
         self._handle = None
 
     def configure(self, domains: List[NvidiaGPUDomain] = None):
-        EnergyDevice.configure(self, domains)
+        Device.configure(self, domains)
         self._handle = [pynvml.nvmlDeviceGetHandleByIndex(domain.device_id) for domain in self._configured_domains]
 
     def get_energy(self):
@@ -83,7 +83,7 @@ class NvidiaGPUDevice(EnergyDevice):
         try:
             pynvml.nvmlInit()
         except pynvml.NVMLError:
-            raise NoSuchEnergyDeviceError()
+            raise NoSuchDeviceError()
 
         device_ids = pynvml.nvmlDeviceGetCount()
         domains = map(lambda device_id: NvidiaGPUDomain(device_id), range(device_ids))

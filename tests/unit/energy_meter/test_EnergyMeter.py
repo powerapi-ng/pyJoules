@@ -23,8 +23,8 @@ from mock import patch
 
 from pyJoules.energy_meter import EnergyMeter, EnergySample
 from pyJoules.energy_meter import EnergyMeterNotStartedError, EnergyMeterNotStoppedError, SampleNotFoundError
-from pyJoules.energy_device import EnergyDevice, EnergyDomain
-from pyJoules.energy_sample import EnergyTrace
+from pyJoules.device import Device, Domain
+from pyJoules.energy_trace import EnergyTrace
 from ...utils.sample import assert_sample_are_equals
 
 DEVICE1_ENERGY_TRACE = [[1.0, 1.1],
@@ -42,50 +42,50 @@ DEVICE2_ENERGY_TRACE = [[4.0],
 TIMESTAMP_TRACE = [1.1, 3.2, 3.3, 4.4, 5.5]
 
 
-class EnergyDomainDevice1Domain1(EnergyDomain):
+class DomainDevice1Domain1(Domain):
     def __repr__(self):
         return 'device1_domain1'
 
 
-class EnergyDomainDevice1Domain2(EnergyDomain):
+class DomainDevice1Domain2(Domain):
     def __repr__(self):
         return 'device1_domain2'
 
 
-class EnergyDomainDevice2Domain1(EnergyDomain):
+class DomainDevice2Domain1(Domain):
     def __repr__(self):
         return 'device2_domain1'
 
 
-class MockedEnergyDevice1(EnergyDevice):
+class MockedDevice1(Device):
 
     def __init__(self):
-        EnergyDevice.__init__(self)
+        Device.__init__(self)
         self.iterator = DEVICE1_ENERGY_TRACE.__iter__()
 
     @staticmethod
     def available_domains():
-        return [EnergyDomainDevice1Domain1(), EnergyDomainDevice1Domain2()]
+        return [DomainDevice1Domain1(), DomainDevice1Domain2()]
 
     def configure(self, domains=None):
-        EnergyDevice.configure(self, domains)
+        Device.configure(self, domains)
 
     def get_energy(self):
         return self.iterator.__next__()
 
 
-class MockedEnergyDevice2(EnergyDevice):
+class MockedDevice2(Device):
 
     def __init__(self):
-        EnergyDevice.__init__(self)
+        Device.__init__(self)
         self.iterator = DEVICE2_ENERGY_TRACE.__iter__()
 
     @staticmethod
     def available_domains():
-        return [EnergyDomainDevice2Domain1()]
+        return [DomainDevice2Domain1()]
 
     def configure(self, domains=None):
-        EnergyDevice.configure(self, domains)
+        Device.configure(self, domains)
 
     def get_energy(self):
         return self.iterator.__next__()
@@ -93,9 +93,9 @@ class MockedEnergyDevice2(EnergyDevice):
 
 @pytest.fixture
 def energy_meter():
-    device1 = MockedEnergyDevice1()
+    device1 = MockedDevice1()
     device1.configure()
-    device2 = MockedEnergyDevice2()
+    device2 = MockedDevice2()
     device2.configure()
     return EnergyMeter([device1, device2])
 
@@ -127,9 +127,9 @@ def sample1():
     ts = TIMESTAMP_TRACE[0]
     tag = ''
     duration = TIMESTAMP_TRACE[1] - TIMESTAMP_TRACE[0]
-    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[1][0] - DEVICE1_ENERGY_TRACE[0][0],
-              str(EnergyDomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[1][1] - DEVICE1_ENERGY_TRACE[0][1],
-              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[1][0] - DEVICE2_ENERGY_TRACE[0][0]}
+    energy = {str(DomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[1][0] - DEVICE1_ENERGY_TRACE[0][0],
+              str(DomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[1][1] - DEVICE1_ENERGY_TRACE[0][1],
+              str(DomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[1][0] - DEVICE2_ENERGY_TRACE[0][0]}
     return EnergySample(ts, tag, duration, energy)
 
 
@@ -138,9 +138,9 @@ def sample2():
     ts = TIMESTAMP_TRACE[1]
     tag = ''
     duration = TIMESTAMP_TRACE[2] - TIMESTAMP_TRACE[1]
-    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[2][0] - DEVICE1_ENERGY_TRACE[1][0],
-              str(EnergyDomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[2][1] - DEVICE1_ENERGY_TRACE[1][1],
-              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[2][0] - DEVICE2_ENERGY_TRACE[1][0]}
+    energy = {str(DomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[2][0] - DEVICE1_ENERGY_TRACE[1][0],
+              str(DomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[2][1] - DEVICE1_ENERGY_TRACE[1][1],
+              str(DomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[2][0] - DEVICE2_ENERGY_TRACE[1][0]}
     return EnergySample(ts, tag, duration, energy)
 
 
@@ -149,9 +149,9 @@ def sample2_5():
     ts = TIMESTAMP_TRACE[2]
     tag = ''
     duration = TIMESTAMP_TRACE[3] - TIMESTAMP_TRACE[2]
-    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[3][0] - DEVICE1_ENERGY_TRACE[2][0],
-              str(EnergyDomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[3][1] - DEVICE1_ENERGY_TRACE[2][1],
-              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[3][0] - DEVICE2_ENERGY_TRACE[2][0]}
+    energy = {str(DomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[3][0] - DEVICE1_ENERGY_TRACE[2][0],
+              str(DomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[3][1] - DEVICE1_ENERGY_TRACE[2][1],
+              str(DomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[3][0] - DEVICE2_ENERGY_TRACE[2][0]}
     return EnergySample(ts, tag, duration, energy)
 
 
@@ -160,9 +160,9 @@ def sample3():
     ts = TIMESTAMP_TRACE[3]
     tag = ''
     duration = TIMESTAMP_TRACE[4] - TIMESTAMP_TRACE[3]
-    energy = {str(EnergyDomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[4][0] - DEVICE1_ENERGY_TRACE[3][0],
-              str(EnergyDomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[4][1] - DEVICE1_ENERGY_TRACE[3][1],
-              str(EnergyDomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[4][0] - DEVICE2_ENERGY_TRACE[3][0]}
+    energy = {str(DomainDevice1Domain1()): DEVICE1_ENERGY_TRACE[4][0] - DEVICE1_ENERGY_TRACE[3][0],
+              str(DomainDevice1Domain2()): DEVICE1_ENERGY_TRACE[4][1] - DEVICE1_ENERGY_TRACE[3][1],
+              str(DomainDevice2Domain1()): DEVICE2_ENERGY_TRACE[4][0] - DEVICE2_ENERGY_TRACE[3][0]}
     return EnergySample(ts, tag, duration, energy)
 
 
@@ -294,9 +294,9 @@ def test_second_start_on_an_energy_meter_should_restart_the_trace(_mocked_fun, e
 ############
 def test_define_energy_meter_with_default_tag_create_sample_with_default_tag():
 
-    device1 = MockedEnergyDevice1()
+    device1 = MockedDevice1()
     device1.configure()
-    device2 = MockedEnergyDevice2()
+    device2 = MockedDevice2()
     device2.configure()
     meter = EnergyMeter([device1, device2], default_tag='tag')
 

@@ -24,10 +24,10 @@ decorate a function and measure its energy consumption, output the energy consum
 import pytest
 from mock import patch
 
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
-from pyJoules.energy_meter import EnergyMeter, measureit
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
-from pyJoules.energy_handler.csv_handler import CSVHandler
+from pyJoules.device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
+from pyJoules.energy_meter import EnergyMeter, measure_energy
+from pyJoules.device.nvidia_device import NvidiaGPUDomain
+from pyJoules.handler.csv_handler import CSVHandler
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
 from ..utils.fake_nvidia_api import one_gpu_api
 from .. utils.fake_api import CorrectTrace
@@ -50,7 +50,7 @@ def test_measure_rapl_device_all_domains(_mocked_time, fs_pkg_dram_one_socket, o
     correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)
 
     csv_handler = CSVHandler('result.csv')
-    @measureit(handler=csv_handler, domains=domains)
+    @measure_energy(handler=csv_handler, domains=domains)
     def foo():
         correct_trace.add_new_sample('stop')
         return 1

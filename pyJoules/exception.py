@@ -39,7 +39,7 @@ class NoSuchDomainError(PyJoulesException):
         self.domain_name = domain_name
 
 
-class NoSuchEnergyDeviceError(PyJoulesException):
+class NoSuchDeviceError(PyJoulesException):
     """
-    Exception raised when a EnergyDevice that does not exist on the current machine is created
+    Exception raised when a Device that does not exist on the current machine is created
     """

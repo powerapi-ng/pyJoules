@@ -18,5 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .energy_handler import EnergyHandler, UnconsistantSamplesError
-from .print_handler import PrintHandler
+from functools import reduce
+from operator import add
+
+from ..energy_trace import EnergyTrace
+from .handler import EnergyHandler
+
+
+class PrintHandler(EnergyHandler):
+
+    def process(self, trace: EnergyTrace):
+        """
+        Print the given sample on the standard output
+        """
+        begin_string = f'begin timestamp : {trace.timestamp}; tag : {trace.tag}; duration : {trace.duration}'
+        energy_strings = [f'; {domain} : {value}' for domain, value in trace.energy.items()]
+
+        print(reduce(add, energy_strings, begin_string))

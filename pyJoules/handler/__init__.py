@@ -18,14 +18,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-class EnergyDomain:
-    """
-    Identify a domain, a monitorable sub-part of a device
-    """
-
-    def __repr__(self) -> str:
-        raise NotImplementedError()
-
-    def get_device_type(self):
-        raise NotImplementedError()
+from .handler import EnergyHandler, UnconsistantSamplesError
+from .print_handler import PrintHandler

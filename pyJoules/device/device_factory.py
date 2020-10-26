@@ -21,7 +21,7 @@
 from typing import List, Optional
 import logging
 from operator import add
-from . import EnergyDomain, EnergyDevice
+from . import Domain, Device
 from .rapl_device import RaplDevice
 try:
     from .nvidia_device import NvidiaGPUDevice
@@ -29,15 +29,15 @@ except ImportError:
     NvidiaGPUDevice=None
     logging.warning('pynvml not found you can\'t use NVIDIA devices') 
 
-from ..exception import NoSuchEnergyDeviceError
+from ..exception import NoSuchDeviceError
 
 from functools import reduce
 
 
-class EnergyDeviceFactory:
+class DeviceFactory:
 
     @staticmethod
-    def _gen_all_available_domains() -> List[EnergyDevice]:
+    def _gen_all_available_domains() -> List[Device]:
         available_api = [RaplDevice]
         if NvidiaGPUDevice is not None : 
             available_api.append(NvidiaGPUDevice)
@@ -45,24 +45,24 @@ class EnergyDeviceFactory:
         for api in available_api:
             try:
                 available_domains.append(api.available_domains())
-            except NoSuchEnergyDeviceError:
+            except NoSuchDeviceError:
                 pass
         flaten_available_domain_list = reduce(add, available_domains, [])
         return flaten_available_domain_list
 
     @staticmethod
-    def create_devices(domains: Optional[EnergyDomain] = None) -> List[EnergyDevice]:
+    def create_devices(domains: Optional[Domain] = None) -> List[Device]:
         """
-        Create and configure the EnergyDevice instance with the given EnergyDomains
+        Create and configure the Device instance with the given Domains
 
-        :param domains: a list of EnergyDomain instance that as to be monitored (if None, return a list of all
+        :param domains: a list of Domain instance that as to be monitored (if None, return a list of all
                         monitorable devices)
-        :return: a list of device configured with the given EnergyDomains
-        :raise NoSuchEnergyDeviceError: if a domain depend on a device that doesn't exist on the current machine
+        :return: a list of device configured with the given Domains
+        :raise NoSuchDeviceError: if a domain depend on a device that doesn't exist on the current machine
         :raise NoSuchDomainError: if the given domain is not available on the device
         """
         if domains is None:
-            domains = EnergyDeviceFactory._gen_all_available_domains()
+            domains = DeviceFactory._gen_all_available_domains()
 
         grouped_domains = {}
         for device_type, domain in map(lambda d: (d.get_device_type(), d), domains):

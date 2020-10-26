@@ -22,16 +22,16 @@ import pytest
 
 from .... utils.rapl_fs import *
 
-from pyJoules.energy_device import NotConfiguredDeviceException
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain, RaplCoreDomain
-from pyJoules.energy_device.rapl_device import RaplUncoreDomain
-from pyJoules.exception import NoSuchEnergyDeviceError, NoSuchDomainError
+from pyJoules.device import NotConfiguredDeviceException
+from pyJoules.device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain, RaplCoreDomain
+from pyJoules.device.rapl_device import RaplUncoreDomain
+from pyJoules.exception import NoSuchDeviceError, NoSuchDomainError
 
 ##############
 # INIT TESTS #
 ##############
-def test_create_RaplDevice_with_no_rapl_api_raise_NoSuchEnergyDeviceError(empty_fs):
-    with pytest.raises(NoSuchEnergyDeviceError):
+def test_create_RaplDevice_with_no_rapl_api_raise_NoSuchDeviceError(empty_fs):
+    with pytest.raises(NoSuchDeviceError):
         RaplDevice()
 
 def test_create_RaplDevice(fs_pkg_one_socket):
@@ -43,8 +43,8 @@ def test_create_RaplDevice(fs_pkg_one_socket):
 ###########################
 # AVAILABLE DOMAINS TESTS #
 ###########################
-def test_available_domains_with_no_rapl_api_raise_NoSuchEnergyDeviceError(empty_fs):
-    with pytest.raises(NoSuchEnergyDeviceError):
+def test_available_domains_with_no_rapl_api_raise_NoSuchDeviceError(empty_fs):
+    with pytest.raises(NoSuchDeviceError):
         RaplDevice.available_domains()
 
 

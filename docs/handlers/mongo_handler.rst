@@ -14,7 +14,7 @@ Example :
 
 .. code-block:: python
 
-   from pyJoules.energy_handler.mongo_handler import MongoHandler
+   from pyJoules.handler.mongo_handler import MongoHandler
    mongo_handler = MongoHandler(uri='mongodb://localhost', database_name='db', collection_name='collection')
 		
    with EnergyContext(handler=mongo_handler, domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)], start_tag='foo') as ctx:

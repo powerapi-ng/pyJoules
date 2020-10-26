@@ -22,9 +22,9 @@ import pytest
 import pyfakefs
 import os.path
 
-from pyJoules.energy_handler.csv_handler import CSVHandler
-from pyJoules.energy_handler import UnconsistantSamplesError
-from pyJoules.energy_sample import EnergySample, EnergyTrace
+from pyJoules.handler.csv_handler import CSVHandler
+from pyJoules.handler import UnconsistantSamplesError
+from pyJoules.energy_trace import EnergySample, EnergyTrace
 
 
 @pytest.fixture

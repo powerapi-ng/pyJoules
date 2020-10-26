@@ -18,20 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from functools import reduce
-from operator import add
-
-from ..energy_sample import EnergyTrace
-from .energy_handler import EnergyHandler
-
-
-class PrintHandler(EnergyHandler):
-
-    def process(self, trace: EnergyTrace):
-        """
-        Print the given sample on the standard output
-        """
-        begin_string = f'begin timestamp : {trace.timestamp}; tag : {trace.tag}; duration : {trace.duration}'
-        energy_strings = [f'; {domain} : {value}' for domain, value in trace.energy.items()]
-
-        print(reduce(add, energy_strings, begin_string))
+from .domain import Domain
+from .device import Device, NotConfiguredDeviceException
+from .device_factory import DeviceFactory

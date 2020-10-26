@@ -25,9 +25,9 @@ import pytest
 
 from mock import patch
 
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
-from pyJoules.energy_meter import EnergyMeter, measureit
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+from pyJoules.device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
+from pyJoules.energy_meter import EnergyMeter, measure_energy
+from pyJoules.device.nvidia_device import NvidiaGPUDomain
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
 from ..utils.fake_nvidia_api import one_gpu_api
 from .. utils.fake_api import CorrectTrace
@@ -43,7 +43,7 @@ MOCKED_TIMESTAMP_TRACE = INIT_TS + FIRST_TS + SECOND_TS
 TIMESTAMP_TRACE = [1.1, 2.2]
 
 
-@patch('pyJoules.energy_handler.EnergyHandler')
+@patch('pyJoules.handler.EnergyHandler')
 @patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
 def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
 
@@ -51,7 +51,7 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dr
 
     correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
-    @measureit(handler=mocked_handler, domains=domains)
+    @measure_energy(handler=mocked_handler, domains=domains)
     def measured_function(val):
         correct_trace.add_new_sample('stop')  # test
         return val + 1

@@ -18,23 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import pytest
 
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain, NvidiaGPUDevice
-
-
-@pytest.fixture(params=[-1, 0, 1])
-def integer_value(request):
-    """parametrize a test function with negative, null and positive integers
+class Domain:
     """
-    return request.param
+    Identify a domain, a monitorable sub-part of a device
+    """
 
+    def __repr__(self) -> str:
+        raise NotImplementedError()
 
-def test_repr_return_nvidia_gpu_underscore_device_id(integer_value):
-    domain = NvidiaGPUDomain(integer_value)
-    assert str(domain) == 'nvidia_gpu_' + str(integer_value)
-
-
-def test_get_device_type_return_NvidiaGPUDevice():
-    domain = NvidiaGPUDomain(0)
-    assert domain.get_device_type() == NvidiaGPUDevice
+    def get_device_type(self):
+        raise NotImplementedError()

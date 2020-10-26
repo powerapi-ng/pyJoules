@@ -3,7 +3,7 @@ Core modules
 
 Decorator
 =========
-.. autodecorator:: pyJoules.energy_meter.measureit
+.. autodecorator:: pyJoules.energy_meter.measure_energy
 
 Context
 =======
@@ -19,15 +19,15 @@ Class
 
    .. automethod:: __init__
 
-.. autoclass:: pyJoules.energy_sample.EnergyTrace
+.. autoclass:: pyJoules.energy_trace.EnergyTrace
    :members:
 
    .. automethod:: __init__
 
-.. autoclass:: pyJoules.energy_sample.EnergySample
+.. autoclass:: pyJoules.energy_trace.EnergySample
    :members:
 
-.. autoclass:: pyJoules.energy_device.energy_device_factory.EnergyDeviceFactory
+.. autoclass:: pyJoules.device.device_factory.DeviceFactory
    :members:
       
 
@@ -38,7 +38,7 @@ Exception
    :members:
 .. autoexception:: pyJoules.exception.NoSuchDomainError
    :members:
-.. autoexception:: pyJoules.exception.NoSuchEnergyDeviceError
+.. autoexception:: pyJoules.exception.NoSuchDeviceError
    :members:
 .. autoexception:: pyJoules.energy_meter.NoNextStateException
    :members:

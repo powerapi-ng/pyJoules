@@ -26,7 +26,7 @@ except ImportError:
     logging.getLogger().info("PyMongo is not installed.")
 
 from . import EnergyHandler
-from ..energy_sample import EnergySample
+from ..energy_trace import EnergySample
 
 
 def sample_to_dict(sample: EnergySample) -> Dict:

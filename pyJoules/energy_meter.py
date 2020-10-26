@@ -25,9 +25,9 @@ from functools import reduce
 from typing import List, Optional, Dict
 
 from .exception import PyJoulesException
-from .energy_device import EnergyDevice, EnergyDomain, EnergyDeviceFactory
-from .energy_handler import EnergyHandler, PrintHandler
-from .energy_sample import EnergySample, EnergyTrace
+from .device import Device, Domain, DeviceFactory
+from .handler import EnergyHandler, PrintHandler
+from .energy_trace import EnergySample, EnergyTrace
 
 class NoNextStateException(PyJoulesException):
     """Exception raised when trying to compute duration or energy from a state
@@ -63,7 +63,7 @@ class EnergyMeter:
     Tool used to record the energy consumption of given devices
     """
 
-    def __init__(self, devices: List[EnergyDevice], default_tag: str = ''):
+    def __init__(self, devices: List[Device], default_tag: str = ''):
         """
         :param devices: list of the monitored devices
         :param default_tag: tag given if no tag were given to a measure
@@ -278,7 +278,7 @@ class EnergyState:
         self.next_state = state
 
 
-def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None):
+def measure_energy(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optional[List[Domain]] = None):
     """
     Measure the energy consumption of monitored devices during the execution of the decorated function
 
@@ -287,7 +287,7 @@ def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optio
     """
     def decorator_measure_energy(func):
 
-        devices = EnergyDeviceFactory.create_devices(domains)
+        devices = DeviceFactory.create_devices(domains)
         energy_meter = EnergyMeter(devices)
 
         @functools.wraps(func)
@@ -308,7 +308,7 @@ def measureit(func=None ,handler: EnergyHandler = PrintHandler(), domains: Optio
 
 class EnergyContext():
 
-    def __init__(self, handler: EnergyHandler = PrintHandler(), domains: Optional[List[EnergyDomain]] = None, start_tag: str = 'start'):
+    def __init__(self, handler: EnergyHandler = PrintHandler(), domains: Optional[List[Domain]] = None, start_tag: str = 'start'):
         """
         Measure the energy consumption of monitored devices during the execution of the contextualized code
 
@@ -319,7 +319,7 @@ class EnergyContext():
         self.handler = handler
         self.start_tag = start_tag
 
-        devices = EnergyDeviceFactory.create_devices(domains)
+        devices = DeviceFactory.create_devices(domains)
         self.energy_meter = EnergyMeter(devices)
 
     def __enter__(self) -> EnergyMeter:

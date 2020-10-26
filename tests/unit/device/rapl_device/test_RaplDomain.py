@@ -20,7 +20,7 @@
 
 import pytest
 
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplCoreDomain, RaplDramDomain, RaplPackageDomain, RaplUncoreDomain
+from pyJoules.device.rapl_device import RaplDevice, RaplCoreDomain, RaplDramDomain, RaplPackageDomain, RaplUncoreDomain
 
 
 @pytest.fixture(params=[-1, 0, 1])

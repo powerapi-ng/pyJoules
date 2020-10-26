@@ -60,13 +60,13 @@ Decorate a function to measure its energy consumption
 To measure the energy consumed by the machine during the execution of the
 function ``foo()`` run the following code::
 
-To measure the energy consumed by the machine during the execution of the function ``foo()`` run the following code with the :raw-role:`<a href="API.html#pyJoules.energy_meter.measureit">` ``measureit`` :raw-role:`</a>` decorator:
+To measure the energy consumed by the machine during the execution of the function ``foo()`` run the following code with the :raw-role:`<a href="API.html#pyJoules.energy_meter.measure_energy">` ``measure_energy`` :raw-role:`</a>` decorator:
 
 .. code-block:: python
 
-   from pyJoules.energy_meter import measureit
+   from pyJoules.energy_meter import measure_energy
 
-   @measureit
+   @measure_energy
    def foo():
        # Instructions to be evaluated.
 

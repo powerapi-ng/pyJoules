@@ -21,8 +21,8 @@
 import pytest
 import pandas
 
-from pyJoules.energy_handler.pandas_handler import PandasHandler, NoSampleProcessedError, UnconsistantSamplesError
-from pyJoules.energy_sample import EnergySample, EnergyTrace
+from pyJoules.handler.pandas_handler import PandasHandler, NoSampleProcessedError, UnconsistantSamplesError
+from pyJoules.energy_trace import EnergySample, EnergyTrace
 
 
 @pytest.fixture

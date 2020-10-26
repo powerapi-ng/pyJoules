@@ -25,8 +25,8 @@ import pytest
 
 from mock import patch
 
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+from pyJoules.device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
+from pyJoules.device.nvidia_device import NvidiaGPUDomain
 from pyJoules.energy_meter import EnergyMeter, EnergyContext
 from .. utils.rapl_fs import fs_pkg_dram_one_socket
 from ..utils.fake_nvidia_api import one_gpu_api
@@ -42,7 +42,7 @@ THIRD_TS = [3.3] * 7
 MOCKED_TIMESTAMP_TRACE = FIRST_TS + SECOND_TS + THIRD_TS
 TIMESTAMP_TRACE = [1.1, 2.2, 3.3]
 
-@patch('pyJoules.energy_handler.EnergyHandler')
+@patch('pyJoules.handler.EnergyHandler')
 @patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
 def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
 
@@ -64,7 +64,7 @@ def test_measure_rapl_device_all_domains(mocked_handler, _mocked_time, fs_pkg_dr
         assert_sample_are_equals(correct_sample, measured_sample)  # test
 
 
-@patch('pyJoules.energy_handler.EnergyHandler')
+@patch('pyJoules.handler.EnergyHandler')
 @patch('time.time', side_effect=MOCKED_TIMESTAMP_TRACE)
 def test_measure_rapl_device_default_values(mocked_handler, _mocked_time, fs_pkg_dram_one_socket, one_gpu_api):
 

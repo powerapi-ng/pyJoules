@@ -24,9 +24,9 @@ Test to measure energy consumption of a trace only with the energy meter
 import pytest
 
 from mock import patch
-from pyJoules.energy_device import EnergyDeviceFactory
-from pyJoules.energy_device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDevice, NvidiaGPUDomain
+from pyJoules.device import DeviceFactory
+from pyJoules.device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain
+from pyJoules.device.nvidia_device import NvidiaGPUDevice, NvidiaGPUDomain
 from pyJoules.energy_meter import EnergyMeter
 from ..utils.rapl_fs import fs_pkg_dram_one_socket
 from ..utils.fake_nvidia_api import one_gpu_api
@@ -77,7 +77,7 @@ def test_measure_rapl_device_all_domains_configuration_with_factory(_mocked_time
 
     correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
-    devices = EnergyDeviceFactory.create_devices(domains)
+    devices = DeviceFactory.create_devices(domains)
 
     meter = EnergyMeter(devices)
 
@@ -103,7 +103,7 @@ def test_measure_rapl_device_all_domains_configuration_with_factory_with_default
 
     correct_trace = CorrectTrace(domains, [fs_pkg_dram_one_socket, one_gpu_api], TIMESTAMP_TRACE)  # test
 
-    devices = EnergyDeviceFactory.create_devices()
+    devices = DeviceFactory.create_devices()
 
     meter = EnergyMeter(devices)
 

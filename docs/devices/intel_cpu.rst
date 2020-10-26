@@ -21,13 +21,13 @@ With :
 
 Usage
 =====
-To configure your function decorator, context manager or energy meter to measure specific part of a CPU, pass as ``domain`` attribute a list of instance of a subClass of ``pyJoules.energy_device.rapl_device.RaplDomain`` corresponding to the domain you want to monitor.
+To configure your function decorator, context manager or energy meter to measure specific part of a CPU, pass as ``domain`` attribute a list of instance of a subClass of ``pyJoules.device.rapl_device.RaplDomain`` corresponding to the domain you want to monitor.
 
 For example, if you want to configure a context manager to measure the energy consumed by the Core domain follow this example :
 
 .. code-block:: python
 
-   from pyJoules.energy_device.rapl_device import RaplCoreDomain
+   from pyJoules.device.rapl_device import RaplCoreDomain
    with EnergyContext(domains=[RaplCoreDomain(0)):
        foo()
 

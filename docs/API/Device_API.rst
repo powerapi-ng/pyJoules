@@ -1,47 +1,47 @@
 Device API
 **********
-.. automodule:: pyJoules.energy_device
+.. automodule:: pyJoules.device
 		   
 Abstract Class
 ==============
-.. autoclass:: pyJoules.energy_device.EnergyDomain
+.. autoclass:: pyJoules.device.Domain
    :members:
 
-.. autoclass:: pyJoules.energy_device.EnergyDevice
+.. autoclass:: pyJoules.device.Device
    :members:
 
 RAPL Device Classes
 ===================
-.. autoclass:: pyJoules.energy_device.rapl_device.RaplDevice
+.. autoclass:: pyJoules.device.rapl_device.RaplDevice
    :members:
 
-.. autoclass:: pyJoules.energy_device.rapl_device.RaplDomain
+.. autoclass:: pyJoules.device.rapl_device.RaplDomain
    :members:
 
-.. autoclass:: pyJoules.energy_device.rapl_device.RaplCoreDomain
+.. autoclass:: pyJoules.device.rapl_device.RaplCoreDomain
    :members:
 
-.. autoclass:: pyJoules.energy_device.rapl_device.RaplUncoreDomain
+.. autoclass:: pyJoules.device.rapl_device.RaplUncoreDomain
    :members:
 
-.. autoclass:: pyJoules.energy_device.rapl_device.RaplDramDomain
+.. autoclass:: pyJoules.device.rapl_device.RaplDramDomain
    :members:
 
-.. autoclass:: pyJoules.energy_device.rapl_device.RaplPackageDomain
+.. autoclass:: pyJoules.device.rapl_device.RaplPackageDomain
    :members:
       
 
 Nvidia GPU Device Classes
 =========================
-.. autoclass:: pyJoules.energy_device.nvidia_device.NvidiaGPUDevice
+.. autoclass:: pyJoules.device.nvidia_device.NvidiaGPUDevice
    :members:
 
-.. autoclass:: pyJoules.energy_device.nvidia_device.NvidiaGPUDomain
+.. autoclass:: pyJoules.device.nvidia_device.NvidiaGPUDomain
    :members:
       
 Exception
 =========
-.. autoexception:: pyJoules.energy_device.NotConfiguredDeviceException
+.. autoexception:: pyJoules.device.NotConfiguredDeviceException
    :members:
 
       

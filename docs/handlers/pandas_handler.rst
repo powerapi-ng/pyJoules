@@ -14,7 +14,7 @@ Example :
 
 .. code-block:: python
 
-   from pyJoules.energy_handler.pandas_handler import PandasHandler
+   from pyJoules.handler.pandas_handler import PandasHandler
    pandas_handler = PandasHandler()
 		
    with EnergyContext(handler=pandas_handler, domains=[RaplPackageDomain(1), NvidiaGPUDomain(0)], start_tag='foo') as ctx:

@@ -21,8 +21,8 @@ import pytest
 import pymongo
 
 
-from pyJoules.energy_sample import EnergySample, EnergyTrace
-from pyJoules.energy_handler.mongo_handler import MongoHandler, MongoInitError
+from pyJoules.energy_trace import EnergySample, EnergyTrace
+from pyJoules.handler.mongo_handler import MongoHandler, MongoInitError
 
 
 URI = 'mongodb://localhost:27017'

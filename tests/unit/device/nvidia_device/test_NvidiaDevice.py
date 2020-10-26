@@ -22,22 +22,22 @@ import pytest
 import pynvml
 from mock import patch
 from ....utils.fake_nvidia_api import no_gpu_api, one_gpu_api, two_gpu_api
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDevice, NvidiaGPUDomain
-from pyJoules.energy_device import NotConfiguredDeviceException
-from pyJoules.exception import NoSuchEnergyDeviceError, NoSuchDomainError
+from pyJoules.device.nvidia_device import NvidiaGPUDevice, NvidiaGPUDomain
+from pyJoules.device import NotConfiguredDeviceException
+from pyJoules.exception import NoSuchDeviceError, NoSuchDomainError
 
 ##############
 # INIT TESTS #
 ##############
-def test_create_NvidiaDevice_with_no_gpu_api_raise_NoSuchEnergyDeviceError(no_gpu_api):
-    with pytest.raises(NoSuchEnergyDeviceError):
+def test_create_NvidiaDevice_with_no_gpu_api_raise_NoSuchDeviceError(no_gpu_api):
+    with pytest.raises(NoSuchDeviceError):
         NvidiaGPUDevice()
 
 ###########################
 # AVAILABLE DOMAINS TESTS #
 ###########################
-def test_available_domains_with_no_gpu_api_raise_NoSuchEnergyDeviceError(no_gpu_api):
-    with pytest.raises(NoSuchEnergyDeviceError):
+def test_available_domains_with_no_gpu_api_raise_NoSuchDeviceError(no_gpu_api):
+    with pytest.raises(NoSuchDeviceError):
         NvidiaGPUDevice.available_domains()
 
 

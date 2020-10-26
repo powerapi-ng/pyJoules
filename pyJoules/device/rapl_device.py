@@ -20,14 +20,14 @@
 import os
 from typing import List
 
-from . import EnergyDevice, EnergyDomain, NotConfiguredDeviceException
-from pyJoules.exception import NoSuchEnergyDeviceError
+from . import Device, Domain, NotConfiguredDeviceException
+from pyJoules.exception import NoSuchDeviceError
 
 
-class RaplDomain(EnergyDomain):
+class RaplDomain(Domain):
 
     def __init__(self, socket: int):
-        EnergyDomain.__init__(self)
+        Domain.__init__(self)
         self.socket = socket
         self._repr = self.get_domain_name() + '_' + str(socket)
 
@@ -83,16 +83,16 @@ class RaplPackageDomain(RaplDomain):
 RAPL_API_DIR = '/sys/class/powercap/intel-rapl'
 
 
-class RaplDevice(EnergyDevice):
+class RaplDevice(Device):
     """
     Interface to get energy consumption of CPU domains
     """
 
     def __init__(self):
         """
-        :raise NoSuchEnergyDeviceError: if no RAPL API is available on this machine
+        :raise NoSuchDeviceError: if no RAPL API is available on this machine
         """
-        EnergyDevice.__init__(self)
+        Device.__init__(self)
         self._api_file_names = None
 
     @staticmethod
@@ -105,7 +105,7 @@ class RaplDevice(EnergyDevice):
         return a the list of the available energy domains
         """
         if not RaplDevice._rapl_api_available():
-            raise NoSuchEnergyDeviceError()
+            raise NoSuchDeviceError()
 
         return (RaplDevice.available_package_domains() + RaplDevice.available_dram_domains() +
                 RaplDevice.available_core_domains() + RaplDevice.available_uncore_domains())
@@ -208,7 +208,7 @@ class RaplDevice(EnergyDevice):
         return [self._get_domain_file_name(domain) for domain in domain_list]
 
     def configure(self, domains=None):
-        EnergyDevice.configure(self, domains)
+        Device.configure(self, domains)
 
         self._api_file_names = self._collect_domain_api_file_name(self._configured_domains)
 

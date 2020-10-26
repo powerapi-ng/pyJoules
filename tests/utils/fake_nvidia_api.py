@@ -21,7 +21,7 @@
 import random
 import pytest
 from pynvml import NVMLError
-from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain, NvidiaGPUDevice
+from pyJoules.device.nvidia_device import NvidiaGPUDomain, NvidiaGPUDevice
 from .fake_api import FakeAPI
 from mock import patch, Mock
 

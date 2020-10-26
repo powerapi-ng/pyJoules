@@ -19,7 +19,7 @@ Create the EnergyMeter
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Before using an energy meter, you have to create it with devices that it have to monitor. For this, use an :raw-role:`<a
-href="../API/main_api.html#pyJoules.energy_device.energy_device_factory.EnergyDeviceFactory">` ``EnergyDeviceFactory`` :raw-role:`</a>` to create and configure the monitored devices
+href="../API/main_api.html#pyJoules.device.device_factory.DeviceFactory">` ``DeviceFactory`` :raw-role:`</a>` to create and configure the monitored devices
 
 The following piece of code show how to create an :raw-role:`<a
 href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter">` ``EnergyMeter``
@@ -28,10 +28,10 @@ href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter">` ``EnergyMeter``
 .. code-block:: python
 
    domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
-   devices = EnergyDeviceFactory.create_devices(domains)
+   devices = DeviceFactory.create_devices(domains)
    meter = EnergyMeter(devices)
 
-Tips : call the :raw-role:`<a href="../API/main_api.html#pyJoules.energy_device.energy_device_factory.EnergyDeviceFactory.create_devices">` ``EnergyDeviceFactory.create_devices`` :raw-role:`</a>` without parameter to get the list of all monitorable devices.
+Tips : call the :raw-role:`<a href="../API/main_api.html#pyJoules.device.device_factory.DeviceFactory.create_devices">` ``DeviceFactory.create_devices`` :raw-role:`</a>` without parameter to get the list of all monitorable devices.
 
 Use the EnergyMeter
 ^^^^^^^^^^^^^^^^^^^
@@ -65,9 +65,9 @@ Get the EnergyTrace
 
 When you finished to measure the energy consumed during execution of your piece of code, you can retrieve its energy trace using the :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.get_trace">` ``EnergyMeter.get_trace`` :raw-role:`</a>` method
 
-This will return an iterator on some :raw-role:`<a href="../API/main_api.html#pyJoules.energy_sample.EnergySample">` ``EnergySample`` :raw-role:`</a>`. Each energy sample contains energy consumption information measured between each call to :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.start">` ``start`` :raw-role:`</a>`, :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.record">` ``record`` :raw-role:`</a>` and :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.stop">` ``stop`` :raw-role:`</a>` method.
+This will return an iterator on some :raw-role:`<a href="../API/main_api.html#pyJoules.energy_trace.EnergySample">` ``EnergySample`` :raw-role:`</a>`. Each energy sample contains energy consumption information measured between each call to :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.start">` ``start`` :raw-role:`</a>`, :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.record">` ``record`` :raw-role:`</a>` and :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.stop">` ``stop`` :raw-role:`</a>` method.
 
-For example, the trace of the previous example contains two :raw-role:`<a href="../API/main_api.html#pyJoules.energy_sample.EnergySample">` ``EnergySample`` :raw-role:`</a>`. One that contains the energy measured between :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.start">` ``start`` :raw-role:`</a>` and :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.record">` ``record`` :raw-role:`</a>` methods (during ``foo`` method execution) and the second that contains energy measured between :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.record">` ``record`` :raw-role:`</a>` and :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.stop">` ``stop`` :raw-role:`</a>` method (during ``bar`` method execution) .
+For example, the trace of the previous example contains two :raw-role:`<a href="../API/main_api.html#pyJoules.energy_trace.EnergySample">` ``EnergySample`` :raw-role:`</a>`. One that contains the energy measured between :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.start">` ``start`` :raw-role:`</a>` and :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.record">` ``record`` :raw-role:`</a>` methods (during ``foo`` method execution) and the second that contains energy measured between :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.record">` ``record`` :raw-role:`</a>` and :raw-role:`<a href="../API/main_api.html#pyJoules.energy_meter.EnergyMeter.stop">` ``stop`` :raw-role:`</a>` method (during ``bar`` method execution) .
 
 Energy sample contains :
 
@@ -81,13 +81,13 @@ Full Example
 
 .. code-block:: python
 
-   from pyJoules.energy_device import EnergyDeviceFactory
-   from pyJoules.energy_device.rapl_device import RaplPackageDomain, RaplDramDomain
-   from pyJoules.energy_device.nvidia_device import NvidiaGPUDomain
+   from pyJoules.device import DeviceFactory
+   from pyJoules.device.rapl_device import RaplPackageDomain, RaplDramDomain
+   from pyJoules.device.nvidia_device import NvidiaGPUDomain
    from pyJoules.energy_meter import EnergyMeter
    
    domains = [RaplPackageDomain(0), RaplDramDomain(0), NvidiaGPUDomain(0)]
-   devices = EnergyDeviceFactory.create_devices(domains)
+   devices = DeviceFactory.create_devices(domains)
    meter = EnergyMeter(devices)
    
    meter.start(tag='foo')

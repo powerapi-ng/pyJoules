@@ -18,44 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ..energy_sample import EnergyTrace
+import pytest
+
+from pyJoules.device.nvidia_device import NvidiaGPUDomain, NvidiaGPUDevice
 
 
-class UnconsistantSamplesError(Exception):
+@pytest.fixture(params=[-1, 0, 1])
+def integer_value(request):
+    """parametrize a test function with negative, null and positive integers
     """
-    Exception raised when processed sample whith differents energy domain
-    """
+    return request.param
 
 
-def _check_samples(samples):
-    sample1 = samples[0]
-
-    for sample in samples:
-        if len(sample.energy) != len(sample1.energy):
-            return False
-        for domain_name, domain_name1 in zip(sample.energy, sample1.energy):
-            if domain_name != domain_name1:
-                return False
-    return True
+def test_repr_return_nvidia_gpu_underscore_device_id(integer_value):
+    domain = NvidiaGPUDomain(integer_value)
+    assert str(domain) == 'nvidia_gpu_' + str(integer_value)
 
 
-class EnergyHandler:
-    """
-    An object that can handle the measured value of an energy trace
-    """
-
-    def __init__(self):
-        self.traces = []
-
-    def process(self, trace: EnergyTrace):
-        """
-        """
-        self.traces.append(trace)
-
-    def _flaten_trace(self):
-        flatened_trace = EnergyTrace([])
-        for trace in self.traces:
-            flatened_trace += trace
-        if not _check_samples(flatened_trace):
-            raise UnconsistantSamplesError()
-        return flatened_trace
+def test_get_device_type_return_NvidiaGPUDevice():
+    domain = NvidiaGPUDomain(0)
+    assert domain.get_device_type() == NvidiaGPUDevice

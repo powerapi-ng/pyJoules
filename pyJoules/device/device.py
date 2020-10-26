@@ -20,7 +20,7 @@
 
 from typing import List, Optional
 
-from . import EnergyDomain
+from . import Domain
 from ..exception import PyJoulesException, NoSuchDomainError
 
 class NotConfiguredDeviceException(PyJoulesException):
@@ -29,7 +29,7 @@ class NotConfiguredDeviceException(PyJoulesException):
     """
 
 
-class EnergyDevice:
+class Device:
     """
     Interface to get energy consumption information about a specific device
     """
@@ -39,18 +39,18 @@ class EnergyDevice:
         self._available_domains = self.available_domains()
 
     @staticmethod
-    def available_domains() -> List[EnergyDomain]:
+    def available_domains() -> List[Domain]:
         """
         Returns names of the domain that could be monitored on the Device
         :return: a list of domain names
-        :raise NoSuchEnergyDeviceError: if the device is not available on this machine
+        :raise NoSuchDeviceError: if the device is not available on this machine
         """
         raise NotImplementedError()
 
-    def configure(self, domains: List[EnergyDomain] = None):
+    def configure(self, domains: List[Domain] = None):
         """
         configure the device to return only the energy consumption of the given energy domain when calling the
-        :py:meth:`pyJoules.energy_device.EnergyDevice.get_energy` method
+        :py:meth:`pyJoules.device.Device.get_energy` method
 
         :param domains: domains to be monitored by the device, if None, all the available domain will be monitored
         :raise NoSuchDomainError: if one given domain could not be monitored on this machine
@@ -70,7 +70,7 @@ class EnergyDevice:
         Get the energy consumption of the device since the last device reset
 
         :return: a list of each domain power consumption. Value order is the same than the domain order passed as
-                 argument to the :py:meth:`pyJoules.energy_device.EnergyDevice.configure` method.
+                 argument to the :py:meth:`pyJoules.device.Device.configure` method.
         """
         raise NotImplementedError()
 
@@ -78,7 +78,7 @@ class EnergyDevice:
         """
         Get the domains that was passed as argument to the configure function
 
-        :return: A list of EnergyDomain
+        :return: A list of Domain
         :raise NotConfiguredDeviceException: if the device was not configured
         """
         if self._configured_domains is None:

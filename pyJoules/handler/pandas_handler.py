@@ -26,7 +26,7 @@ except ImportError:
     logging.getLogger().info("Pandas is not installed.")
 
 from . import EnergyHandler, UnconsistantSamplesError
-from ..energy_sample import EnergyTrace, EnergySample
+from ..energy_trace import EnergyTrace, EnergySample
 
 
 def _gen_column_names(samples):
