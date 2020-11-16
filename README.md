@@ -1,8 +1,8 @@
 # PyJoules
 
 [![License: MIT](https://img.shields.io/pypi/l/pyRAPL)](https://spdx.org/licenses/MIT.html)
-[![Build Status](https://img.shields.io/circleci/build/github/powerapi-ng/pyJoules.svg)](https://circleci.com/gh/powerapi-ng/pyjoules
-[![Doc Status](https://readthedocs.org/projects/pyjoules/badge/?version=latest)(https://pyjoules.readthedocs.io/en/latest/)
+[![Build Status](https://img.shields.io/circleci/build/github/powerapi-ng/pyJoules.svg)](https://circleci.com/gh/powerapi-ng/pyjoules)
+[![Doc Status](https://readthedocs.org/projects/pyjoules/badge/?version=latest)](https://pyjoules.readthedocs.io/en/latest/)
 
 # About
 **pyJoules** is a software toolkit to measure the energy footprint of a host machine along the execution of a piece of Python code.
