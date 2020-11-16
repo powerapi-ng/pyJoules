@@ -31,7 +31,7 @@ class PrintHandler(EnergyHandler):
         """
         Print the given sample on the standard output
         """
-        begin_string = f'begin timestamp : {trace.timestamp}; tag : {trace.tag}; duration : {trace.duration}'
-        energy_strings = [f'; {domain} : {value}' for domain, value in trace.energy.items()]
-
-        print(reduce(add, energy_strings, begin_string))
+        for sample in trace:
+            begin_string = f'begin timestamp : {sample.timestamp}; tag : {sample.tag}; duration : {sample.duration}'
+            energy_strings = [f'; {domain} : {value}' for domain, value in sample.energy.items()]
+            print(reduce(add, energy_strings, begin_string))
