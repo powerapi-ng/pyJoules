@@ -21,6 +21,11 @@ This technology is available on Intel CPU since the [Sandy Bridge generation](ht
 
 ### Nvidia GPU
 **pyJoules** uses the nvidia "_Nvidia Management Library_" technology to measure energy consumption of nvidia devices. The energy measurement API is only available on nvidia GPU with [Volta architecture](https://en.wikipedia.org/wiki/Volta_(microarchitecture))(2018)
+
+### Windows and MacOS
+Only GNU/Linux support is available for the moment. We are working on Mac support
+
+
 # Installation
 
 ### Measurement frequency
