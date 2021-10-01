@@ -76,7 +76,7 @@ class NvidiaGPUDevice(Device):
         self._handle = [pynvml.nvmlDeviceGetHandleByIndex(domain.device_id) for domain in self._configured_domains]
 
     def get_energy(self):
-        return [pynvml.nvmlDeviceGetTotalEnergyConsumption(handle) for handle in self._handle]
+        return [pynvml.nvmlDeviceGetTotalEnergyConsumption(handle) * 1000 for handle in self._handle]
 
     @staticmethod
     def available_domains() -> List[NvidiaGPUDomain]:
