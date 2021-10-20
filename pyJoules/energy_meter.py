@@ -265,6 +265,11 @@ class EnergyState:
 
         values_dict = {}
         for value, key in zip(energy, domains):
+            if value < 0:
+                device = key.get_device_type()
+                domain_dirname = device._get_domain_file_name(None, key)[:-9]
+                with open(domain_dirname + 'max_energy_range_uj', 'r') as file:
+                    value += float(file.readline())
             values_dict[str(key)] = value
         return values_dict
 
