@@ -25,6 +25,11 @@ This technology is available on Intel CPU since the [Sandy Bridge generation](ht
 ### Windows and MacOS
 Only GNU/Linux support is available for the moment. We are working on Mac support
 
+## Known issues
+RAPL energy counters overflow after several minutes or hours, potentially causing false-negative energy readings.
+
+pyJoules takes this into account and adds the counter's maximum possible value, `max_energy_range_uj`, to negative energy measurements. However, if a counter overflows twice during a single energy measurement, the reported energy will be `max_energy_range_uj` less than the expected value.
+
 
 # Installation
 
