@@ -5,6 +5,7 @@ cff-version: 1.2.0
 title: Pyjoules
 message: Make your python code green again
 type: software
+date-released: 2019-11-19
 authors:
   - given-names: Mohammed chakib
     family-names: Belgaid
