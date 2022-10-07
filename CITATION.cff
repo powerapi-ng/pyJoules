@@ -2,7 +2,7 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: Pyjoules
+title: "Pyjoules: Python library that measures python code snippets"
 message: Make your python code green again
 type: software
 date-released: 2019-11-19
