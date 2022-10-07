@@ -1,0 +1,32 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Pyjoules
+message: Make your python code green again
+type: software
+authors:
+  - given-names: Mohammed chakib
+    family-names: Belgaid
+    email: chakib.belgaid@gmail.com
+    orcid: 'https://orcid.org/0000-0002-5264-7426'
+    affiliation: Inria university of Lille
+  - given-names: Romain
+    family-names: Rouvoy
+    email: romain.rouvoy@inria.fr
+    affiliation: inria university of lille
+    orcid: 'https://orcid.org/0000-0003-1771-8791'
+  - orcid: 'https://orcid.org/0000-0003-0006-6088'
+    affiliation: 'Inria  university of lille '
+    email: lionel.seinturier@univ-lille.fr
+    family-names: Seinturier
+    given-names: Lionel
+identifiers:
+  - type: url
+    value: 'https://pyjoules.readthedocs.io'
+repository-code: 'https://github.com/powerapi-ng/pyJoules'
+url: 'http://powerapi.org/'
+repository-artifact: 'https://pypi.org/project/pyJoules/'
+abstract: >-
+  A tool to measure the energy consumption of python
+  code snippets
