@@ -178,6 +178,14 @@ RAPL domains match part of the cpu socket as described in this image :
 - core : correpond to the sum of all cpu core energy consumption
 - uncore : correspond to the integrated GPU
 
+# Output
+
+The output structure of all domains are enabled including their respective units are as follows:
+
+| name | timestamp | tag | duration | package | dram | core | uncore | nvidia_gpu |
+|---|---|---|---|---|---|---|---|---|
+| **type** | datetime | str | ms | uJ | uJ | uJ | uJ | **mJ** |
+
 # Miscellaneous
 
 ## About
