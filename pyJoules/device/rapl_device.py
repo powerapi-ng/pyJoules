@@ -78,7 +78,10 @@ class RaplDramDomain(RaplDomain):
 class RaplPackageDomain(RaplDomain):
     def get_domain_name(self):
         return "package"
-
+    
+class RaplPsysDomain(RaplDomain):
+    def get_domain_name(self):
+        return "psys"
 
 RAPL_API_DIR = '/sys/class/powercap/intel-rapl'
 
@@ -108,7 +111,8 @@ class RaplDevice(Device):
             raise NoSuchDeviceError()
 
         return (RaplDevice.available_package_domains() + RaplDevice.available_dram_domains() +
-                RaplDevice.available_core_domains() + RaplDevice.available_uncore_domains())
+                RaplDevice.available_core_domains() + RaplDevice.available_uncore_domains() +
+                RaplDevice.available_psys_domains())
 
     @staticmethod
     def _get_socket_id_list():
@@ -136,20 +140,40 @@ class RaplDevice(Device):
                      if domain_name_file.readline() == 'package-' + str(socket_id) + '\n':
                          package_domains.append(RaplPackageDomain(socket_id))
         return package_domains
+    
+    @staticmethod
+    def available_psys_domains() -> List[RaplPsysDomain]:
+        """
+        return a list of the available energy Psys domains
+        """
+        psys_domains = []
+        for socket_id in RaplDevice._get_socket_id_list():
+            if RaplDevice._domain_exist_on_socket(socket_id, 'psys'):
+                psys_domains.append(RaplPsysDomain(socket_id))
+        return psys_domains
+
 
     @staticmethod
     def _domain_exist_on_socket(socket_id, domain_name):
+        domain_name_file_str = RAPL_API_DIR + f'/intel-rapl:{socket_id}/name'
+        if os.path.exists(domain_name_file_str):
+            with open(domain_name_file_str) as f:
+                if f.readline().strip() == domain_name:
+                    return True
+
         domain_id = 0
         while True:
-            domain_name_file_str = (RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/intel-rapl:' + str(socket_id) +
-                                    ':' + str(domain_id) + '/name')
-            if os.path.exists(domain_name_file_str):
-                with open(domain_name_file_str) as domain_name_file:
-                    if domain_name_file.readline() == domain_name + '\n':
+            subdomain_name_file = (RAPL_API_DIR + f'/intel-rapl:{socket_id}/intel-rapl:{socket_id}:{domain_id}/name')
+            if os.path.exists(subdomain_name_file):
+                with open(subdomain_name_file) as f:
+                    if f.readline().strip() == domain_name:
                         return True
-                    domain_id += 1
+                domain_id += 1
             else:
-                return False
+                break
+
+        return False
+
 
     @staticmethod
     def available_dram_domains() -> List[RaplDramDomain]:
@@ -188,6 +212,9 @@ class RaplDevice(Device):
         socket_id = domain.socket
 
         if isinstance(domain, RaplPackageDomain):
+            return RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/energy_uj'
+        
+        if isinstance(domain, RaplPsysDomain):
             return RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/energy_uj'
 
         domain_id = 0
