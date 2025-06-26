@@ -34,7 +34,7 @@ pyJoules takes this into account and adds the counter's maximum possible value, 
 # Installation
 
 ### Measurement frequency
-PyJoule use hardware measurement tools (intel RAPL, nvidia GPU tools, ...) to measure device energy consumption. Theses tools have a mesasurement frequency that depend of the device. Thus, you can't use Pyjoule to measure energy consumption during a period shorter than the device energy measurement frequency. Pyjoule will return null values if the measurement period is to short.
+PyJoule use hardware measurement tools (intel RAPL, nvidia GPU tools, ...) to measure device energy consumption. Theses tools have a mesasurement frequency that depend of the device. Thus, you can't use Pyjoule to measure energy consumption during a period shorter than the device energy measurement frequency. Pyjoule will return null values if the measurement period is too short.
 
 ## Requirements
 
