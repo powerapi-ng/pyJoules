@@ -113,7 +113,7 @@ def test_stop_a_non_started_energy_meter_raise_EnergyMeterNotStartedError(energy
         energy_meter.stop()
 
 
-def test_resume_a_non_stoped_energy_meter_raise_EnergyMeterNotStoppedError(energy_meter):
+def test_resume_a_non_stopped_energy_meter_raise_EnergyMeterNotStoppedError(energy_meter):
     with pytest.raises(EnergyMeterNotStoppedError):
         energy_meter.start()
         energy_meter.resume()

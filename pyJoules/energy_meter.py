@@ -87,7 +87,7 @@ class EnergyMeter:
     def _is_meter_started(self):
         return not self._first_state is None
 
-    def _is_meter_stoped(self):
+    def _is_meter_stopped(self):
         return self._last_state.tag == '__stop__'
 
     def _reinit(self):
@@ -127,7 +127,7 @@ class EnergyMeter:
         if not self._is_meter_started():
             return self.start(tag)
         
-        if not self._is_meter_stoped():
+        if not self._is_meter_stopped():
             raise EnergyMeterNotStoppedError()
 
         new_state = self._measure_new_state(tag)
@@ -154,7 +154,7 @@ class EnergyMeter:
         if not self._is_meter_started():
             return EnergyTrace([])
 
-        if not self._is_meter_stoped():
+        if not self._is_meter_stopped():
             raise EnergyMeterNotStoppedError()
 
         return self._generate_trace()
@@ -222,7 +222,7 @@ class EnergyState:
 
     def __init__(self, timestamp: float, tag: str, values: List[Dict[str, float]]):
         """
-        :param timstamp: timestamp of the measure
+        :param timestamp: timestamp of the measure
         :param tag: tag of the measure
         :param values: energy consumption measure, this is the list of measured energy consumption values for each
                        monitored device. This list contains the energy consumption since the last device reset to the
