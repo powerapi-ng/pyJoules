@@ -115,7 +115,7 @@ class EnergyTrace:
                            or if a domain of the trace is not in the idle values
         """
         if len(idle) != len(self._samples):
-            raise ValueError('idle list havn\'t the same length than the trace')
+            raise ValueError('idle list hasn\'t the same length as the trace')
 
         for idle_energy, sample in zip(idle, self._samples):
             for domain in sample.energy:
@@ -123,7 +123,7 @@ class EnergyTrace:
                     raise ValueError('domain not present in idle values : ' + domain)
                 sample.energy[domain] -= idle_energy[domain]
 
-    def _sample_havnt_negative_values(self, sample):
+    def _sample_hasnt_negative_values(self, sample):
         for val in sample.energy.values():
             if val < 0:
                 return False
@@ -138,7 +138,7 @@ class EnergyTrace:
                        sample as parameter and return True if it must be keept in the trace, False otherwise
         """
 
-        extended_guards = [lambda s: self._sample_havnt_negative_values(s)] + guards
+        extended_guards = [lambda s: self._sample_hasnt_negative_values(s)] + guards
 
         valid_samples = []
         for sample in self._samples:
