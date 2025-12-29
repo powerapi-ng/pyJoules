@@ -24,7 +24,7 @@ from .... utils.rapl_fs import *
 
 from pyJoules.device import NotConfiguredDeviceException
 from pyJoules.device.rapl_device import RaplDevice, RaplPackageDomain, RaplDramDomain, RaplCoreDomain
-from pyJoules.device.rapl_device import RaplUncoreDomain
+from pyJoules.device.rapl_device import RaplUncoreDomain, RaplPsysDomain
 from pyJoules.exception import NoSuchDeviceError, NoSuchDomainError
 
 ##############
@@ -73,7 +73,7 @@ def test_available_domains_with_pkg_uncore_and_dram_rapl_api_return_correct_valu
 
 def test_available_domains_with_pkg_psys_rapl_api_return_correct_values(fs_pkg_psys_one_socket):
     returned_values = RaplDevice.available_domains()
-    correct_values = [RaplPackageDomain(0)]
+    correct_values = [RaplPackageDomain(0), RaplPsysDomain(1)]
     assert sorted(correct_values) == sorted(returned_values)
 
 
