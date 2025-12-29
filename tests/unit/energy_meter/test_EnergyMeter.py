@@ -309,6 +309,14 @@ def test_define_energy_meter_with_default_tag_create_sample_with_default_tag():
     assert sample.tag == 'tag'
 
 
+######################
+# EMPTY DEVICES TEST #
+######################
+def test_energy_meter_with_no_devices_returns_empty_domain_list():
+    meter = EnergyMeter([])
+    assert meter._get_domain_list() == []
+
+
 ############
 # GEN_IDLE #
 ############
