@@ -163,7 +163,7 @@ class EnergyMeter:
         """
         return the list of all monitored domains for each monitored energy devices
         """
-        return reduce(operator.add, [device.get_configured_domains() for device in self.devices])
+        return reduce(operator.add, [device.get_configured_domains() for device in self.devices], [])
 
     def _generate_trace(self):
         domains = self._get_domain_list()
