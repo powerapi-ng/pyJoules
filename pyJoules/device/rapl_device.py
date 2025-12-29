@@ -137,7 +137,7 @@ class RaplDevice(Device):
             domain_name_file_str = RAPL_API_DIR + '/intel-rapl:' + str(socket_id) + '/name'
             if os.path.exists(domain_name_file_str):
                  with open(domain_name_file_str) as domain_name_file:
-                     if domain_name_file.readline() == 'package-' + str(socket_id) + '\n':
+                     if 'package-' in domain_name_file.readline():
                          package_domains.append(RaplPackageDomain(socket_id))
         return package_domains
     
