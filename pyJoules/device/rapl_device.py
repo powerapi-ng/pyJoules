@@ -239,9 +239,9 @@ class RaplDevice(Device):
 
         self._api_file_names = self._collect_domain_api_file_name(self._configured_domains)
 
-    def _read_energy_value(self, api_file):
-        return float(api_file.readline())
+    def _read_energy_value(self, api_file_name):
+        with open(api_file_name, 'r') as api_file:
+            return float(api_file.readline())
 
     def get_energy(self):
-        energies = [self._read_energy_value(open(api_file_name, 'r')) for api_file_name in self._api_file_names]
-        return energies
+        return [self._read_energy_value(api_file_name) for api_file_name in self._api_file_names]
