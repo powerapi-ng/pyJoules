@@ -266,10 +266,17 @@ class EnergyState:
         values_dict = {}
         for value, key in zip(energy, domains):
             if value < 0:
-                device = key.get_device_type()
-                domain_dirname = device._get_domain_file_name(None, key)[:-9]
-                with open(domain_dirname + 'max_energy_range_uj', 'r') as file:
-                    value += float(file.readline())
+                # Handle RAPL counter overflow by adding max_energy_range_uj
+                try:
+                    device = key.get_device_type()
+                    domain_dirname = device._get_domain_file_name(None, key)[:-9]
+                    with open(domain_dirname + 'max_energy_range_uj', 'r') as file:
+                        value += float(file.readline())
+                except (AttributeError, FileNotFoundError, ValueError):
+                    # Device doesn't support overflow correction (e.g., NVIDIA GPU)
+                    # or max_energy_range_uj file not found - keep negative value
+                    # Users can filter these with EnergyTrace.clean_data()
+                    pass
             values_dict[str(key)] = value
         return values_dict
 
